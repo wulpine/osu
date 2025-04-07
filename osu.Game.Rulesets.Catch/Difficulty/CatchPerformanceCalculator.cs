@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 double missPenalty = 0.96 / (numMiss / (4 * Math.Pow(Math.Log(catchAttributes.MovementDifficultStrainCount), 0.94)) + 1);
                 double worstCaseMaxCombo = Math.Ceiling((double)(catchAttributes.MaxCombo - numMiss) / (numMiss + 1));
                 double comboRatio = catchAttributes.MaxCombo - numMiss - worstCaseMaxCombo == 0 ? 0 : (score.MaxCombo - worstCaseMaxCombo) / (catchAttributes.MaxCombo - numMiss - worstCaseMaxCombo);
-                double comboBonus = comboRatio <= 0.780807 ? Math.Pow(comboRatio, 0.8) : 1 / (1 + Math.Pow(0.64 * (1 - comboRatio) / (0.36 * comboRatio), 0.5));
+                double comboBonus = comboRatio <= 0.780807 ? Math.Pow(comboRatio, 0.8) / 1.4 : 1 / (1 + Math.Pow(0.64 * (1 - comboRatio) / (0.36 * comboRatio), 0.5));
                 value *= missPenalty + 0.7 * comboBonus * (1 - missPenalty);
             }
 
