@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double difficulty_multiplier = 4.59;
+        private const double difficulty_multiplier = 1.0;
 
         private float halfCatcherWidth;
 
@@ -36,9 +36,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods };
 
+            var precision = skills.OfType<Precision>().Single();
+            var reading = skills.OfType<Reading>().Single();
+            var speed = skills.OfType<Speed>().Single();
+
+            double precisionRating = Math.Sqrt(precision.DifficultyValue()) * difficulty_multiplier;
+            double readingRating = Math.Sqrt(reading.DifficultyValue()) * difficulty_multiplier;
+            double speedRating = Math.Sqrt(speed.DifficultyValue()) * difficulty_multiplier;
+
+            double starRating = Math.Pow(Math.Pow(precisionRating, 2) + Math.Pow(readingRating, 2) + Math.Pow(speedRating, 2), 1.0 / 2.0);
+
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = Math.Sqrt(skills.OfType<Movement>().Single().DifficultyValue()) * difficulty_multiplier,
+                StarRating = starRating,
+                PrecisionRating = precisionRating,
+                ReadingRating = readingRating,
+                SpeedRating = speedRating,
                 Mods = mods,
                 MaxCombo = beatmap.GetMaxCombo(),
             };
@@ -51,6 +64,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             CatchHitObject? lastObject = null;
 
             List<DifficultyHitObject> objects = new List<DifficultyHitObject>();
+            List<Flow> flows = new List<Flow>();
 
             // In 2B beatmaps, it is possible that a normal Fruit is placed in the middle of a JuiceStream.
             foreach (var hitObject in CatchBeatmap.GetPalpableObjects(beatmap.HitObjects))
@@ -60,7 +74,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     continue;
 
                 if (lastObject != null)
-                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, objects.Count));
+                    objects.Add(new CatchDifficultyHitObject(hitObject, lastObject, clockRate, halfCatcherWidth, objects, flows, objects.Count));
 
                 lastObject = hitObject;
             }
@@ -72,12 +86,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             halfCatcherWidth = Catcher.CalculateCatchWidth(beatmap.Difficulty) * 0.5f;
 
-            // For circle sizes above 5.5, reduce the catcher width further to simulate imperfect gameplay.
-            halfCatcherWidth *= 1 - (Math.Max(0, beatmap.Difficulty.CircleSize - 5.5f) * 0.0625f);
-
             return new Skill[]
             {
-                new Movement(mods, halfCatcherWidth, clockRate),
+                new Precision(mods, halfCatcherWidth, clockRate),
+                new Reading(mods),
+                new Speed(mods),
             };
         }
 

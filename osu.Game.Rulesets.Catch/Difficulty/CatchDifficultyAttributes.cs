@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 
@@ -9,6 +10,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyAttributes : DifficultyAttributes
     {
+        [JsonProperty("precision_rating")]
+        public double PrecisionRating { get; set; }
+
+        [JsonProperty("reading_rating")]
+        public double ReadingRating { get; set; }
+
+        [JsonProperty("speed_rating")]
+        public double SpeedRating { get; set; }
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())

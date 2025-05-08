@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
 
@@ -11,87 +13,163 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 {
     public class CatchDifficultyHitObject : DifficultyHitObject
     {
-        public const float NORMALIZED_HALF_CATCHER_WIDTH = 41.0f;
-        private const float absolute_player_positioning_error = 16.0f;
-
         public new PalpableCatchHitObject BaseObject => (PalpableCatchHitObject)base.BaseObject;
-
         public new PalpableCatchHitObject LastObject => (PalpableCatchHitObject)base.LastObject;
 
-        /// <summary>
-        /// Normalized position of <see cref="BaseObject"/>.
-        /// </summary>
-        public readonly float NormalizedPosition;
+        public readonly int BuzzCount;
+        public readonly double CatcherDashSpeed;
+        private readonly double catcherWalkSpeed;
+        public readonly float DistanceMoved;
+        public readonly Flow Flow;
+        private int movementDiscrepancyCount;
+        public readonly MovementType MovementType;
 
         /// <summary>
-        /// Normalized position of <see cref="LastObject"/>.
-        /// </summary>
-        public readonly float LastNormalizedPosition;
-
-        /// <summary>
-        /// Normalized position of the player required to catch <see cref="BaseObject"/>, assuming the player moves as little as possible.
-        /// </summary>
-        public float PlayerPosition { get; private set; }
-
-        /// <summary>
-        /// Normalized position of the player after catching <see cref="LastObject"/>.
-        /// </summary>
-        public float LastPlayerPosition { get; private set; }
-
-        /// <summary>
-        /// Normalized distance between <see cref="LastPlayerPosition"/> and <see cref="PlayerPosition"/>.
-        /// </summary>
-        /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
-        /// </remarks>
-        public float DistanceMoved { get; private set; }
-
-        /// <summary>
-        /// Normalized distance the player has to move from <see cref="LastPlayerPosition"/> in order to catch <see cref="BaseObject"/> at its <see cref="NormalizedPosition"/>.
-        /// </summary>
-        /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
-        /// </remarks>
-        public float ExactDistanceMoved { get; private set; }
-
-        /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
+        /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 20ms.
         /// </summary>
         public readonly double StrainTime;
 
-        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index)
+        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, List<Flow> flows, int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = NORMALIZED_HALF_CATCHER_WIDTH / halfCatcherWidth;
+            DistanceMoved = BaseObject.EffectiveX - LastObject.EffectiveX;
 
-            NormalizedPosition = BaseObject.EffectiveX * scalingFactor;
-            LastNormalizedPosition = LastObject.EffectiveX * scalingFactor;
+            catcherWalkSpeed = Catcher.BASE_WALK_SPEED * clockRate;
+            CatcherDashSpeed = Catcher.BASE_DASH_SPEED * clockRate * getHyperDashModifier(clockRate);
 
-            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
-            StrainTime = Math.Max(40, DeltaTime);
+            BuzzCount = getBuzzCount(halfCatcherWidth);
+            DistanceMoved *= 1 - Math.Clamp(BuzzCount - 1, 0, 4) / 4.0f;
 
-            setMovementState();
+            MovementType = getMovementType(halfCatcherWidth, clockRate);
+
+            // Every strain interval is hard capped at the equivalent of 375 BPM 1/8 speed as a safety measure
+            StrainTime = Math.Max(20, DeltaTime);
+
+            var prev = (CatchDifficultyHitObject)Previous(0);
+
+            if (prev != null && prev.Flow.MovementType == MovementType)
+            {
+                prev.Flow.Add(this);
+                Flow = prev.Flow;
+            }
+            else
+            {
+                Flow = new Flow(new List<CatchDifficultyHitObject> { this }, flows, flows.Count);
+                flows.Add(Flow);
+            }
         }
 
-        private void setMovementState()
+        private int getBuzzCount(float halfCatcherWidth)
         {
-            LastPlayerPosition = Index == 0 ? LastNormalizedPosition : ((CatchDifficultyHitObject)Previous(0)).PlayerPosition;
+            if (DistanceMoved > halfCatcherWidth * 2)
+                return 0;
 
-            PlayerPosition = Math.Clamp(
-                LastPlayerPosition,
-                NormalizedPosition - (NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error),
-                NormalizedPosition + (NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error)
-            );
+            float min = DistanceMoved < 0 ? BaseObject.EffectiveX : LastObject.EffectiveX;
+            float max = DistanceMoved < 0 ? LastObject.EffectiveX : BaseObject.EffectiveX;
+            int count = 1;
 
-            DistanceMoved = PlayerPosition - LastPlayerPosition;
+            for (int i = 0; i < Index; i++)
+            {
+                var prev = (CatchDifficultyHitObject)Previous(i);
 
-            // For the exact position we consider that the catcher is in the correct position for both objects
-            ExactDistanceMoved = NormalizedPosition - LastPlayerPosition;
+                min = Math.Min(min, prev.LastObject.EffectiveX);
+                max = Math.Max(max, prev.LastObject.EffectiveX);
 
-            // After a hyperdash we ARE in the correct position. Always!
-            if (LastObject.HyperDash)
-                PlayerPosition = NormalizedPosition;
+                if (max - min > halfCatcherWidth * 2)
+                    break;
+
+                count++;
+            }
+
+            return count;
+        }
+
+        private double getHyperDashModifier(double clockRate) => LastObject.HyperDash ? Math.Max(1, Math.Abs(DistanceMoved) / Math.Max(1, DeltaTime * clockRate - 1000.0 / 60.0)) : 1;
+
+        private MovementType getMovementType(float halfCatcherWidth, double clockRate)
+        {
+            var naiveMovementType = getNaiveMovementType(halfCatcherWidth);
+            var adjustedMovementType = getAdjustedMovementType(naiveMovementType, halfCatcherWidth, clockRate);
+
+            movementDiscrepancyCount = adjustedMovementType != naiveMovementType ? 1 : 0;
+
+            var prev = (CatchDifficultyHitObject)Previous(0);
+
+            if (prev == null)
+                return adjustedMovementType;
+
+            if (prev.movementDiscrepancyCount == 3)
+                return naiveMovementType;
+
+            if (adjustedMovementType != naiveMovementType)
+                movementDiscrepancyCount += prev.movementDiscrepancyCount;
+
+            return adjustedMovementType;
+        }
+
+        private MovementType getNaiveMovementType(float halfCatcherWidth)
+        {
+            if (Math.Abs(DistanceMoved) <= halfCatcherWidth)
+                return MovementType.Standstill;
+
+            if (Math.Abs(DistanceMoved) <= catcherWalkSpeed * DeltaTime + halfCatcherWidth)
+                return DistanceMoved < 0 ? MovementType.WalkLeft : MovementType.WalkRight;
+
+            return DistanceMoved < 0 ? MovementType.DashLeft : MovementType.DashRight;
+        }
+
+        private MovementType getAdjustedMovementType(MovementType naiveMovementType, float halfCatcherWidth, double clockRate)
+        {
+            var prev = (CatchDifficultyHitObject)Previous(0);
+            var movementTypeCandidates = getMovementTypeCandidates(halfCatcherWidth, clockRate);
+
+            if (prev == null || movementTypeCandidates.Count == 0)
+                return naiveMovementType;
+
+            if (movementTypeCandidates.Contains(prev.MovementType))
+                return prev.MovementType;
+
+            var priority = new List<Func<MovementType?, bool>>()
+            {
+                m => m!.Value.IsDash() && m.Value.IsSameDirection(prev.MovementType),
+                m => m!.Value.IsDash() && !m.Value.IsSameDirection(prev.MovementType),
+                m => m!.Value == MovementType.Standstill,
+                m => m!.Value.IsWalk() && m.Value.IsSameDirection(prev.MovementType),
+                m => m!.Value.IsWalk() && !m.Value.IsSameDirection(prev.MovementType),
+            };
+
+            var movementTypeCandidatesNullable = movementTypeCandidates.Cast<MovementType?>();
+
+            foreach (var condition in priority)
+            {
+                var match = movementTypeCandidatesNullable.FirstOrDefault(condition);
+                if (match != null)
+                    return match.Value;
+            }
+
+            return naiveMovementType;
+        }
+
+        private List<MovementType> getMovementTypeCandidates(float halfCatcherWidth, double clockRate)
+        {
+            var movementTypeCandidates = new List<MovementType>();
+
+            if (Math.Abs(DistanceMoved) <= halfCatcherWidth * 2)
+                movementTypeCandidates.Add(MovementType.Standstill);
+
+            if (Math.Abs(-1 * DistanceMoved - catcherWalkSpeed * DeltaTime) <= halfCatcherWidth)
+                movementTypeCandidates.Add(MovementType.WalkLeft);
+
+            if (Math.Abs(DistanceMoved - catcherWalkSpeed * DeltaTime) <= halfCatcherWidth)
+                movementTypeCandidates.Add(MovementType.WalkRight);
+
+            if (-1 * DistanceMoved >= 0.8 * clockRate * DeltaTime || -1 * DistanceMoved >= Catcher.BASE_DASH_SPEED * clockRate * DeltaTime - halfCatcherWidth)
+                movementTypeCandidates.Add(MovementType.DashLeft);
+
+            if (DistanceMoved >= 0.8 * clockRate * DeltaTime || DistanceMoved >= Catcher.BASE_DASH_SPEED * clockRate * DeltaTime - halfCatcherWidth)
+                movementTypeCandidates.Add(MovementType.DashRight);
+
+            return movementTypeCandidates;
         }
     }
 }
