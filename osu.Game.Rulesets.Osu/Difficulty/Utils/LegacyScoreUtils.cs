@@ -1,10 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Utils
@@ -32,20 +30,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
             double totalScore = amountOfBigTicks * big_tick_score + amountOfSmallTicks * small_tick_score;
 
             return totalScore / objectCount;
-        }
-
-        public static int CalculateDifficultyPeppyStars(IBeatmap beatmap)
-        {
-            int objectCount = beatmap.HitObjects.Count;
-            int drainLength = 0;
-
-            if (objectCount > 0)
-            {
-                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
-                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
-            }
-
-            return LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
     }
 }

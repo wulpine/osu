@@ -47,7 +47,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
             value *= lengthBonus;
 
-            value *= Math.Pow(0.97, numMiss);
+            double? estimatedBreakCount = null;
+
+            if (score.LegacyTotalScore != null)
+            {
+                if (numMiss > 0)
+                {
+                    var legacyScoreBreakCalculator = new CatchLegacyScoreBreakCalculator(score, catchAttributes);
+                    estimatedBreakCount = legacyScoreBreakCalculator.Calculate();
+                }
+                else
+                    estimatedBreakCount = 0;
+            }
+
+            value *= Math.Pow(0.97, estimatedBreakCount ?? numMiss);
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
@@ -93,7 +106,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return new CatchPerformanceAttributes
             {
-                Total = value
+                Total = value,
+                EstimatedBreakCount = estimatedBreakCount,
             };
         }
 

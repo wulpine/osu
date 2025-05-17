@@ -3,6 +3,8 @@
 
 using System;
 using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Objects.Legacy;
 
 namespace osu.Game.Rulesets.Difficulty.Utils
 {
@@ -101,6 +103,20 @@ namespace osu.Game.Rulesets.Difficulty.Utils
         public static double ReverseLerp(double x, double start, double end)
         {
             return Math.Clamp((x - start) / (end - start), 0.0, 1.0);
+        }
+
+        public static int CalculateDifficultyPeppyStars(IBeatmap beatmap)
+        {
+            int objectCount = beatmap.HitObjects.Count;
+            int drainLength = 0;
+
+            if (objectCount > 0)
+            {
+                int breakLength = beatmap.Breaks.Select(b => (int)Math.Round(b.EndTime) - (int)Math.Round(b.StartTime)).Sum();
+                drainLength = ((int)Math.Round(beatmap.HitObjects[^1].StartTime) - (int)Math.Round(beatmap.HitObjects[0].StartTime) - breakLength) / 1000;
+            }
+
+            return LegacyRulesetExtensions.CalculateDifficultyPeppyStars(beatmap.Difficulty, objectCount, drainLength);
         }
     }
 }

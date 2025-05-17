@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
@@ -36,11 +37,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (beatmap.HitObjects.Count == 0)
                 return new CatchDifficultyAttributes { Mods = mods };
 
+            var simulator = new CatchLegacyScoreSimulator();
+            var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
+
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
                 StarRating = Math.Sqrt(skills.OfType<Movement>().Single().DifficultyValue()) * difficulty_multiplier,
                 Mods = mods,
                 MaxCombo = beatmap.GetMaxCombo(),
+                LegacyScoreBaseMultiplier = DifficultyCalculationUtils.CalculateDifficultyPeppyStars(beatmap),
+                MaximumLegacyComboScore = scoreAttributes.ComboScore,
             };
 
             return attributes;

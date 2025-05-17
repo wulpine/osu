@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
+using osu.Game.Rulesets.Difficulty.Utils;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Osu.Difficulty.Skills;
@@ -114,7 +115,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 : 0;
 
             double sliderNestedScorePerObject = LegacyScoreUtils.CalculateSliderNestedScorePerObject(beatmap, totalHits);
-            double legacyScoreBaseMultiplier = LegacyScoreUtils.CalculateDifficultyPeppyStars(beatmap);
+            double legacyScoreBaseMultiplier = DifficultyCalculationUtils.CalculateDifficultyPeppyStars(beatmap);
 
             var simulator = new OsuLegacyScoreSimulator();
             var scoreAttributes = simulator.Simulate(WorkingBeatmap, beatmap);
