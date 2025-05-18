@@ -24,16 +24,20 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double Calculate()
         {
-            if (attributes.MaxCombo == 0 || score.LegacyTotalScore == null)
-                return 0;
-
+            int countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
+            int countLargeTickHit = score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
+            int countSmallTickHit = score.Statistics.GetValueOrDefault(HitResult.SmallTickHit);
             int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
+
+            if (attributes.MaxCombo == 0 || countMiss == 0 || score.LegacyTotalScore == null)
+                return 0;
 
             double scoreV1Multiplier = attributes.LegacyScoreBaseMultiplier * getLegacyScoreMultiplier();
             double averageHitValue = calculateAverageHitValue();
+            int accuracyScore = 300 * countGreat + 100 * countLargeTickHit + 10 * countSmallTickHit;
 
             double scoreObtainedDuringMaxCombo = calculateScoreAtCombo(score.MaxCombo, averageHitValue, scoreV1Multiplier);
-            double remainingScore = score.LegacyTotalScore.Value - scoreObtainedDuringMaxCombo;
+            double remainingScore = score.LegacyTotalScore.Value - accuracyScore - scoreObtainedDuringMaxCombo;
 
             if (remainingScore <= 0)
                 return 1;
@@ -48,23 +52,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private double calculateScoreAtCombo(int combo, double averageHitValue, double scoreV1Multiplier)
         {
-            int countGreat = score.Statistics.GetValueOrDefault(HitResult.Great);
-            int countLargeTickHit = score.Statistics.GetValueOrDefault(HitResult.LargeTickHit);
-            int countSmallTickHit = score.Statistics.GetValueOrDefault(HitResult.SmallTickHit);
-            int countSmallTickMiss = score.Statistics.GetValueOrDefault(HitResult.SmallTickMiss);
-            int countMiss = score.Statistics.GetValueOrDefault(HitResult.Miss);
-
-            int totalHits = countGreat + countLargeTickHit + countSmallTickHit + countSmallTickMiss + countMiss;
-
             double comboMultiplier = combo > 0 ? (combo - 1) / 2.0 * (combo - 2) : 0;
             double comboScore = averageHitValue * comboMultiplier * scoreV1Multiplier / 25.0;
 
-            double comboRatio = (double)combo / attributes.MaxCombo;
-            double smallTickRatio = (double)countSmallTickHit / totalHits * comboRatio;
-
-            double accuracyScore = averageHitValue * comboRatio * (countGreat + countLargeTickHit) + 10 * smallTickRatio * countSmallTickHit;
-
-            return comboScore + accuracyScore;
+            return comboScore;
         }
 
         private double calculateAverageHitValue()

@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceAttributes : PerformanceAttributes
     {
-        [JsonProperty("estimated_break_count")]
-        public double? EstimatedBreakCount { get; set; }
+        [JsonProperty("effective_miss_count")]
+        public double? EffectiveMissCount { get; set; }
     }
 }

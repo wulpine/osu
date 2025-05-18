@@ -107,7 +107,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return new CatchPerformanceAttributes
             {
                 Total = value,
-                EstimatedBreakCount = estimatedBreakCount,
+                EffectiveMissCount = estimatedBreakCount,
             };
         }
 
