@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (remainingScore <= 0)
                 return 1;
 
-            int remainingCombo = attributes.MaxCombo - score.MaxCombo;
+            int remainingCombo = attributes.MaxCombo - score.MaxCombo - countMiss;
             double expectedRemainingScore = calculateScoreAtCombo(remainingCombo, averageHitValue, scoreV1Multiplier);
 
             double scoreBasedBreakCount = Math.Max(expectedRemainingScore / remainingScore, 1);
