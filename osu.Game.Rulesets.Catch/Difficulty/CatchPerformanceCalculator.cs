@@ -43,15 +43,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             int numTotalHits = totalComboHits();
 
             double lengthBonus =
-                0.95 + 0.3 * Math.Min(1.0, numTotalHits / 2500.0) +
-                (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
+                0.95 + 0.4 * Math.Min(1.0, numTotalHits / 3000.0) +
+                (numTotalHits > 3000 ? Math.Log10(numTotalHits / 3000.0) * 0.5 : 0.0);
             value *= lengthBonus;
 
             value *= Math.Pow(0.97, numMiss);
 
             // Combo scaling
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.35) / Math.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
+                value *= Math.Min(Math.Pow(score.MaxCombo, 0.8) / Math.Pow(catchAttributes.MaxCombo, 0.8), 1.0);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
@@ -67,8 +67,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double approachRateFactor = 1.0;
             if (approachRate > 9.0)
                 approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
-            if (approachRate > 10.0)
-                approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
             else if (approachRate < 8.0)
                 approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
 
@@ -76,11 +74,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             if (score.Mods.Any(m => m is ModHidden))
             {
-                // Hiddens gives almost nothing on max approach rate, and more the lower it is
-                if (approachRate <= 10.0)
-                    value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10
-                else if (approachRate > 10.0)
-                    value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
+                // Hidden gives almost nothing on max approach rate, and more the lower it is
+                value *= 1.05 + 0.075 * (10.0 - Math.Min(10.0, approachRate)); // 7.5% for each AR below 10
             }
 
             if (score.Mods.Any(m => m is ModFlashlight))
@@ -89,7 +84,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             value *= Math.Pow(accuracy(), 5.5);
 
             if (score.Mods.Any(m => m is ModNoFail))
-                value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
+                value *= 0.9;
 
             return new CatchPerformanceAttributes
             {
