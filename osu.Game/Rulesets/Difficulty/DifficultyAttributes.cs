@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
@@ -35,6 +35,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected const int ATTRIB_ID_CONSISTENCY_FACTOR = 45;
         protected const int ATTRIB_ID_READING = 47;
         protected const int ATTRIB_ID_READING_DIFFICULT_NOTE_COUNT = 49;
+        protected const int ATTRIB_ID_TOTAL_ACTIONS = 51;
 
         /// <summary>
         /// The mods which were applied to the beatmap.

@@ -36,22 +36,26 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
             numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
 
-            // We are heavily relying on aim in catch the beat
-            double value = Math.Pow(5.0 * Math.Max(1.0, catchAttributes.StarRating / 0.0049) - 4.0, 2.0) / 100000.0;
+            double value = calculateValue(catchAttributes.SRBeginningNerfed);
 
-            // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
-            int numTotalHits = totalComboHits();
+            const double base_penalty = 0.965;
 
-            double lengthBonus =
-                0.95 + 0.3 * Math.Min(1.0, numTotalHits / 2500.0) +
-                (numTotalHits > 2500 ? Math.Log10(numTotalHits / 2500.0) * 0.475 : 0.0);
-            value *= lengthBonus;
+            double penalty = numMiss switch
+            {
+                0 => 1.0,
+                1 => 0.95,
+                2 => 0.93,
+                3 => 0.90,
+                var x => Math.Pow(base_penalty, 4) * Math.Pow(base_penalty - 0.001 * (x - 4), (x - 4))
+            };
 
-            value *= Math.Pow(0.97, numMiss);
+            value *= penalty;
 
-            // Combo scaling
+            // Combo scaling power is adjusted from 0.35 to 0.30 to compensate for the harsher misscount penalties
+            const double scaling_power = 0.32;
+
             if (catchAttributes.MaxCombo > 0)
-                value *= Math.Min(Math.Pow(score.MaxCombo, 0.35) / Math.Pow(catchAttributes.MaxCombo, 0.35), 1.0);
+                value *= Math.Min(Math.Pow(score.MaxCombo, scaling_power) / Math.Pow(catchAttributes.MaxCombo, scaling_power), 1.0);
 
             var difficulty = score.BeatmapInfo!.Difficulty.Clone();
 
@@ -59,43 +63,59 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
-            // this is the same as osu!, so there's potential to share the implementation... maybe
-            double preempt = IBeatmapDifficultyInfo.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate));
 
-            double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
+            // Longer maps are worth more. "Longer" means how many hits there are approximately
+            // We add some undetected actions approximated with 20% of the maximum combo
+            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.2 * catchAttributes.MaxCombo;
 
-            double approachRateFactor = 1.0;
-            if (approachRate > 9.0)
-                approachRateFactor += 0.1 * (approachRate - 9.0); // 10% for each AR above 9
-            if (approachRate > 10.0)
-                approachRateFactor += 0.1 * (approachRate - 10.0); // Additional 10% at AR 11, 30% total
-            else if (approachRate < 8.0)
-                approachRateFactor += 0.025 * (8.0 - approachRate); // 2.5% for each AR below 8
+            const double linear_pace = 0.34;
+            const int cutoff = 1700;
+            const double logarithmic_pace = 0.25;
 
-            value *= approachRateFactor;
+            double lengthBonus =
+                1.0 + linear_pace * Math.Min(1.0, totalActions / cutoff) +
+                (totalActions > cutoff ? Math.Log10(totalActions / cutoff) * logarithmic_pace : 0.0);
 
-            if (score.Mods.Any(m => m is ModHidden))
-            {
-                // Hiddens gives almost nothing on max approach rate, and more the lower it is
-                if (approachRate <= 10.0)
-                    value *= 1.05 + 0.075 * (10.0 - approachRate); // 7.5% for each AR below 10
-                else if (approachRate > 10.0)
-                    value *= 1.01 + 0.04 * (11.0 - Math.Min(11.0, approachRate)); // 5% at AR 10, 1% at AR 11
-            }
+            // Length bonus should depend on approachRate (including FlashLight): if it's high enough, it's either draining or it requires memorisation
+            lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.5) / 2.0);
 
             if (score.Mods.Any(m => m is ModFlashlight))
-                value *= 1.35 * lengthBonus;
+                lengthBonus = Math.Pow(lengthBonus, 2.0);
 
             value *= Math.Pow(accuracy(), 5.5);
 
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
+            double lengthBonusPP = value * (lengthBonus - 1.0);
+
+            const double value_multiplier = 1.07;
+
+            value *= value_multiplier;
+
             return new CatchPerformanceAttributes
             {
-                Total = value
+                LengthBonus = lengthBonusPP,
+                Total = value + lengthBonusPP,
             };
         }
+
+        public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate)
+        {
+            double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450) / correctedClockRate;
+
+            const double flashlight_visibility_time = 203.125 * 0.77 / 440.0; // 203.125 pixels above catcher are visible at 200 combo; 440 pixels is the height of the visible playfield
+
+            if (mods.Any(m => m is ModFlashlight))
+                preempt *= flashlight_visibility_time;
+
+            return preempt > 1200.0 ? (1800.0 - preempt) / 120.0 : (1200.0 - preempt) / 150.0 + 5.0;
+        }
+
+        public static double CorrectedClockRate(double clockRate) => 1.0 + (clockRate - 1.0) * 0.8; // AR9+DT is approximately AR10.15 after correction
+
+        private double calculateValue(double sr) => Math.Pow(5.0 * Math.Max(1.0, sr / 0.0047) - 4.0, 2.0) / 100000.0;
 
         private double accuracy() => totalHits() == 0 ? 0 : Math.Clamp((double)totalSuccessfulHits() / totalHits(), 0, 1);
         private int totalHits() => num50 + num100 + num300 + numMiss + numKatu;

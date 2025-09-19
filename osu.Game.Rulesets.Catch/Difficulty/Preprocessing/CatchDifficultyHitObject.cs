@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Data;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Objects;
@@ -11,87 +13,142 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing
 {
     public class CatchDifficultyHitObject : DifficultyHitObject
     {
-        public const float NORMALIZED_HALF_CATCHER_WIDTH = 41.0f;
-        private const float absolute_player_positioning_error = 16.0f;
-
         public new PalpableCatchHitObject BaseObject => (PalpableCatchHitObject)base.BaseObject;
 
         public new PalpableCatchHitObject LastObject => (PalpableCatchHitObject)base.LastObject;
 
-        /// <summary>
-        /// Normalized position of <see cref="BaseObject"/>.
-        /// </summary>
-        public readonly float NormalizedPosition;
+        private readonly IReadOnlyList<CatchDifficultyHitObject> noteDifficultyHitObjects;
+
+        public readonly int NoteIndex;
 
         /// <summary>
-        /// Normalized position of <see cref="LastObject"/>.
+        /// Whether this note is a Hyperdash.
         /// </summary>
-        public readonly float LastNormalizedPosition;
+        public bool IsHyper => BaseObject.HyperDash;
 
         /// <summary>
-        /// Normalized position of the player required to catch <see cref="BaseObject"/>, assuming the player moves as little as possible.
+        /// The position of this note.
         /// </summary>
-        public float PlayerPosition { get; private set; }
+        public double Position;
 
         /// <summary>
-        /// Normalized position of the player after catching <see cref="LastObject"/>.
+        /// The distance between this note and the previous note.
         /// </summary>
-        public float LastPlayerPosition { get; private set; }
+        public double DeltaPosition;
 
         /// <summary>
-        /// Normalized distance between <see cref="LastPlayerPosition"/> and <see cref="PlayerPosition"/>.
+        /// The left border of the note.
+        /// </summary>
+        public double LeftNoteBorder;
+
+        /// <summary>
+        /// The right border of the note.
+        /// </summary>
+        public double RightNoteBorder;
+
+        /// <summary>
+        /// The note border closest to the previous note.
+        /// </summary>
+        public double BackwardNoteBorder => IsMovingRight ? LeftNoteBorder : RightNoteBorder;
+
+        /// <summary>
+        /// The note border closest to the next note.
+        /// </summary>
+        public double ForwardNoteBorder => IsMovingRight ? RightNoteBorder : LeftNoteBorder;
+
+        /// <summary>
+        /// Whether this note is to the right of the previous note.
         /// </summary>
         /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
+        /// Difficulty calculation for each pattern is symmetric, with values having to be inverted depending on this property.
         /// </remarks>
-        public float DistanceMoved { get; private set; }
+        public bool IsMovingRight;
 
         /// <summary>
-        /// Normalized distance the player has to move from <see cref="LastPlayerPosition"/> in order to catch <see cref="BaseObject"/> at its <see cref="NormalizedPosition"/>.
+        /// The direction of movement between this note and the previous note.
         /// </summary>
         /// <remarks>
-        /// The sign of the value indicates the direction of the movement: negative is left and positive is right.
+        /// If the distance is not deemed 'significant' enough (allowing for the catcher to catch both notes without any), this is set to None.
         /// </remarks>
-        public float ExactDistanceMoved { get; private set; }
+        public MovementDirection SignificantMovementDirection(double catcherWidth, double clockRate) =>
+            (Position - LastObject.EffectiveX / clockRate > catcherWidth / 2.0 || (Position > LastObject.EffectiveX / clockRate && LastObject.HyperDash))
+                ? MovementDirection.Right
+                : ((LastObject.EffectiveX / clockRate - Position > catcherWidth / 2.0 || (LastObject.EffectiveX / clockRate > Position && LastObject.HyperDash))
+                    ? MovementDirection.Left
+                    : MovementDirection.None);
 
         /// <summary>
-        /// Milliseconds elapsed since the start time of the previous <see cref="CatchDifficultyHitObject"/>, with a minimum of 40ms.
+        /// Movement data used in difficulty calculation.
+        /// This is updated with meaningful values for each note by the available Preprocessors.
         /// </summary>
-        public readonly double StrainTime;
+        public CatchMovementData MovementData;
 
-        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate, float halfCatcherWidth, List<DifficultyHitObject> objects, int index)
+        /// <summary>
+        /// Reading data used in difficulty calculation.
+        /// </summary>
+        public CatchReadingData ReadingData;
+
+        /// <summary>
+        /// Data used only for GUI display - to be potentially removed in the future.
+        /// </summary>
+        public CatchDisplayData DisplayData;
+
+        public CatchDifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate,
+                                        double normalizedCatcherWidth,
+                                        List<DifficultyHitObject> objects,
+                                        List<CatchDifficultyHitObject> noteObjects,
+                                        int index)
             : base(hitObject, lastObject, clockRate, objects, index)
         {
-            // We will scale everything by this factor, so we can assume a uniform CircleSize among beatmaps.
-            float scalingFactor = NORMALIZED_HALF_CATCHER_WIDTH / halfCatcherWidth;
+            Position = BaseObject.EffectiveX / clockRate;
+            LeftNoteBorder = Position - normalizedCatcherWidth / 2.0;
+            RightNoteBorder = Position + normalizedCatcherWidth / 2.0;
 
-            NormalizedPosition = BaseObject.EffectiveX * scalingFactor;
-            LastNormalizedPosition = LastObject.EffectiveX * scalingFactor;
+            // Temporary hack to ensure DeltaPosition > 0
+            if (noteObjects.Count >= 2)
+            {
+                CatchDifficultyHitObject prev = noteObjects[^1];
+                CatchDifficultyHitObject prevPrev = noteObjects[^2];
 
-            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
-            StrainTime = Math.Max(40, DeltaTime);
+                if (Position - prev.Position == 0)
+                {
+                    bool isMovingRight = prev.Position - prevPrev.Position > 0;
 
-            setMovementState();
+                    if (isMovingRight)
+                    {
+                        Position += 0.01;
+                    }
+                    else
+                    {
+                        Position -= 0.01;
+                    }
+                }
+            }
+
+            DeltaPosition = Math.Abs(Position - LastObject.EffectiveX / clockRate);
+
+            if (noteObjects.Count >= 1)
+            {
+                CatchDifficultyHitObject prev = noteObjects[^1];
+                IsMovingRight = Position > prev.Position;
+            }
+            else
+            {
+                IsMovingRight = Position >= LastObject.EffectiveX / clockRate;
+            }
+
+            noteDifficultyHitObjects = noteObjects;
+            noteObjects.Add(this);
+
+            NoteIndex = index;
+
+            MovementData = new CatchMovementData(this, normalizedCatcherWidth, clockRate);
+            ReadingData = new CatchReadingData();
+            DisplayData = new CatchDisplayData();
         }
 
-        private void setMovementState()
-        {
-            LastPlayerPosition = Index == 0 ? LastNormalizedPosition : ((CatchDifficultyHitObject)Previous(0)).PlayerPosition;
+        public CatchDifficultyHitObject? PreviousNote(int backwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex - (backwardsIndex + 1));
 
-            PlayerPosition = Math.Clamp(
-                LastPlayerPosition,
-                NormalizedPosition - (NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error),
-                NormalizedPosition + (NORMALIZED_HALF_CATCHER_WIDTH - absolute_player_positioning_error)
-            );
-
-            DistanceMoved = PlayerPosition - LastPlayerPosition;
-
-            // For the exact position we consider that the catcher is in the correct position for both objects
-            ExactDistanceMoved = NormalizedPosition - LastPlayerPosition;
-
-            // After a hyperdash we ARE in the correct position. Always!
-            if (LastObject.HyperDash)
-                PlayerPosition = NormalizedPosition;
-        }
+        public CatchDifficultyHitObject? NextNote(int forwardsIndex) => noteDifficultyHitObjects.ElementAtOrDefault(NoteIndex + (forwardsIndex + 1));
     }
 }
