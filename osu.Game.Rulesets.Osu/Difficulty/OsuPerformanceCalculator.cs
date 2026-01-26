@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public const double PERFORMANCE_BASE_MULTIPLIER = 1.12; // This is being adjusted to keep the final pp value scaled around what it used to be when changing things.
         public const double PERFORMANCE_NORM_EXPONENT = 1.1;
 
+        private readonly OsuDifficultyConstants fallbackTuning;
         private bool usingClassicSliderAccuracy;
         private bool usingScoreV2;
 
@@ -62,14 +63,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double aimEstimatedSliderBreaks;
         private double speedEstimatedSliderBreaks;
 
-        public OsuPerformanceCalculator()
-            : base(new OsuRuleset())
+        public OsuPerformanceCalculator(OsuDifficultyConstants? tuning = null)
+            : base(new OsuRuleset(tuning))
         {
+            fallbackTuning = tuning ?? OsuDifficultyConstants.Default;
         }
 
         protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
             var osuAttributes = (OsuDifficultyAttributes)attributes;
+            var tuning = osuAttributes.Tuning ?? fallbackTuning;
 
             usingClassicSliderAccuracy = score.Mods.OfType<OsuModClassic>().Any(m => m.NoSliderHeadAccuracy.Value);
             usingScoreV2 = score.Mods.Any(m => m is ModScoreV2);
@@ -142,15 +145,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
 
-            double aimValue = computeAimValue(score, osuAttributes);
-            double speedValue = computeSpeedValue(score, osuAttributes);
-            double accuracyValue = computeAccuracyValue(score, osuAttributes);
+            double aimValue = computeAimValue(score, osuAttributes) * tuning.AimPerformanceScale;
+            double speedValue = computeSpeedValue(score, osuAttributes) * tuning.SpeedPerformanceScale;
+            double accuracyValue = computeAccuracyValue(score, osuAttributes) * tuning.AccuracyPerformanceScale;
 
-            double readingValue = computeReadingValue(osuAttributes);
-            double flashlightValue = computeFlashlightValue(score, osuAttributes);
-            double cognitionValue = DifficultyCalculationUtils.Norm(2, readingValue, flashlightValue);
+            double readingValue = computeReadingValue(osuAttributes) * tuning.ReadingPerformanceScale;
+            double flashlightValue = computeFlashlightValue(score, osuAttributes) * tuning.FlashlightPerformanceScale;
+            double cognitionValue = DifficultyCalculationUtils.Norm(tuning.CognitionPerformanceExponent, readingValue, flashlightValue);
 
-            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, cognitionValue) * multiplier;
+            double totalValue = DifficultyCalculationUtils.Norm(PERFORMANCE_NORM_EXPONENT, aimValue, speedValue, accuracyValue, cognitionValue) * multiplier * tuning.TotalPerformanceScale;
 
             return new OsuPerformanceAttributes
             {
@@ -165,7 +168,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 AimEstimatedSliderBreaks = aimEstimatedSliderBreaks,
                 SpeedEstimatedSliderBreaks = speedEstimatedSliderBreaks,
                 SpeedDeviation = speedDeviation,
-                Total = totalValue
+                Total = totalValue,
+                Tuning = tuning
             };
         }
 
