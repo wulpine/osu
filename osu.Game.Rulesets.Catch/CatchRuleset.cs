@@ -45,6 +45,11 @@ namespace osu.Game.Rulesets.Catch
     {
         private readonly CatchDifficultyConstants tuning;
 
+        public CatchRuleset()
+            : this(null)
+        {
+        }
+
         public CatchRuleset(CatchDifficultyConstants? tuning = null)
         {
             this.tuning = tuning ?? CatchDifficultyConstants.Default;
