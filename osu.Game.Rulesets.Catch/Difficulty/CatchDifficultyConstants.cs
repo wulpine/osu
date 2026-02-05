@@ -1,0 +1,84 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+namespace osu.Game.Rulesets.Catch.Difficulty
+{
+    public record CatchDifficultyConstants
+    {
+        public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
+
+        public double DifficultyMultiplier { get; init; } = 0.0147;
+        public double ApproachRateSecondConstant { get; init; } = 0.34;
+        public double BeginningTimePenaltyPower { get; init; } = 0.3;
+        public double BeginningFullPenalty { get; init; } = 0.5;
+
+        public double SrScalerY1 { get; init; } = 4.55;
+        public double SrScalerY2 { get; init; } = 6.9;
+        public double SrScalerY3 { get; init; } = 8.7;
+        public double SrScalerY4 { get; init; } = 9.4;
+        public double SrScalerY5 { get; init; } = 10.2;
+        public double SrScalerY6 { get; init; } = 11.0;
+
+        public double DefaultDecayWeight { get; init; } = 0.9;
+        public double[] DecayWeights { get; init; } = new[] { 0.9, 0.86, 0.81, 0.729, 0.6561 };
+
+        public double LocalStarRatingMaxConstant { get; init; } = 1.0;
+        public double LocalStarRatingMinConstant { get; init; } = 0.8;
+        public double LocalStarRatingCorrelationConstant { get; init; } = 0.15;
+
+        public double PerformanceLengthLinearPace { get; init; } = 0.34;
+        public int PerformanceLengthCutoff { get; init; } = 1700;
+        public double PerformanceLengthLogarithmicPace { get; init; } = 0.25;
+        public double PerformanceValueMultiplier { get; init; } = 1.07;
+
+        public double PrecisionRawWeightHyperjumps { get; init; } = 0.93;
+        public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.98;
+        public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 0.98;
+        public double PrecisionRawWeightJumps { get; init; } = 1.0;
+        public double PrecisionDelayedWeight { get; init; } = 0.85;
+
+        public double PrecisionStrainAmplitude { get; init; } = 40.0;
+        public double PrecisionStrainShift { get; init; } = -15.0;
+        public double PrecisionStrainPace { get; init; } = 25.0;
+        public double PrecisionStrainMultiplier { get; init; } = 39.0;
+
+        public double MaxPrecisionCorrection { get; init; } = 1.3;
+
+        public double SpeedSnapAmplitude { get; init; } = 13.0;
+        public double SpeedSnapShift { get; init; } = -50.0;
+        public double SpeedSnapPace { get; init; } = 35.0;
+        public double SpeedSnapMultiplier { get; init; } = 0.88;
+
+        public double SpeedBurstAmplitude { get; init; } = 13.0;
+        public double SpeedBurstShift { get; init; } = -50.0;
+        public double SpeedBurstPace { get; init; } = 35.0;
+        public double SpeedBurstMultiplier { get; init; } = 0.99;
+
+        public double SpeedConsistencyAmplitude { get; init; } = 13.0;
+        public double SpeedConsistencyShift { get; init; } = -50.0;
+        public double SpeedConsistencyPace { get; init; } = 35.0;
+        public double SpeedConsistencyMultiplier { get; init; } = 1.14;
+
+        public double ReadingHighCsPower { get; init; } = 1.6;
+        public double ReadingHighCsRate { get; init; } = 0.39;
+        public double ReadingHighCsPenaltyHypers { get; init; } = 0.75;
+
+        public double ReadingLocalRhythmPenalty { get; init; } = 0.95;
+        public double ReadingExplicitRhythmPenalty { get; init; } = 0.93;
+        public double ReadingImplicitRhythmPenalty { get; init; } = 1.0;
+        public double ReadingSimilarDistancePenalty { get; init; } = 0.85;
+        public double ReadingAlternatingDistancePenalty { get; init; } = 0.98;
+        public double ReadingHyperchainPenalty { get; init; } = 0.92;
+        public double ReadingNonHyperchainPenalty { get; init; } = 0.96;
+        public double ReadingHighVelocityNerf { get; init; } = 0.13;
+        public double ReadingHighDistanceBuff { get; init; } = 0.15;
+        public double ReadingFakeActionBuff { get; init; } = 1.0;
+        public double ReadingFuturePrecisionBuff { get; init; } = 0.15;
+
+        public double StandingWidthAdditiveConstant { get; init; } = 1.25;
+
+        public double PrecisionCorrectionDistanceExponent { get; init; } = 0.75;
+        public double PrecisionCorrectionTimeExponent { get; init; } = 1.5;
+        public double PrecisionCorrectionDistanceWeight { get; init; } = 0.5;
+    }
+}

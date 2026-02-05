@@ -37,6 +37,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         [JsonProperty("sr_beginning_nerfed")]
         public double SRBeginningNerfed { get; set; }
 
+        [JsonIgnore]
+        public CatchDifficultyConstants Tuning { get; init; } = CatchDifficultyConstants.Default;
+
         public override IEnumerable<(int attributeId, object value)> ToDatabaseAttributes()
         {
             foreach (var v in base.ToDatabaseAttributes())

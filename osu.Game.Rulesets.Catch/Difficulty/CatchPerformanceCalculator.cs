@@ -15,20 +15,23 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchPerformanceCalculator : PerformanceCalculator
     {
+        private readonly CatchDifficultyConstants fallbackTuning;
         private int num300;
         private int num100;
         private int num50;
         private int numKatu;
         private int numMiss;
 
-        public CatchPerformanceCalculator()
-            : base(new CatchRuleset())
+        public CatchPerformanceCalculator(CatchDifficultyConstants? tuning = null)
+            : base(new CatchRuleset(tuning))
         {
+            fallbackTuning = tuning ?? CatchDifficultyConstants.Default;
         }
 
         protected override PerformanceAttributes CreatePerformanceAttributes(ScoreInfo score, DifficultyAttributes attributes)
         {
             var catchAttributes = (CatchDifficultyAttributes)attributes;
+            var tuning = catchAttributes.Tuning ?? fallbackTuning;
 
             num300 = score.GetCount300() ?? 0; // HitResult.Great
             num100 = score.GetCount100() ?? 0; // HitResult.LargeTickHit
@@ -69,9 +72,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // We add some undetected actions approximated with 20% of the maximum combo
             double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.2 * catchAttributes.MaxCombo;
 
-            const double linear_pace = 0.34;
-            const int cutoff = 1700;
-            const double logarithmic_pace = 0.25;
+            double linear_pace = tuning.PerformanceLengthLinearPace;
+            int cutoff = tuning.PerformanceLengthCutoff;
+            double logarithmic_pace = tuning.PerformanceLengthLogarithmicPace;
 
             double lengthBonus =
                 1.0 + linear_pace * Math.Min(1.0, totalActions / cutoff) +
@@ -90,7 +93,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double lengthBonusPP = value * (lengthBonus - 1.0);
 
-            const double value_multiplier = 1.07;
+            double value_multiplier = tuning.PerformanceValueMultiplier;
 
             value *= value_multiplier;
 
@@ -98,6 +101,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 LengthBonus = lengthBonusPP,
                 Total = value + lengthBonusPP,
+                Tuning = tuning,
             };
         }
 
