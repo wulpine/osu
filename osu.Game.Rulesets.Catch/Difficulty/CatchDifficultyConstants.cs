@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double DifficultyMultiplier { get; init; } = 0.0147;
         public double ApproachRateSecondConstant { get; init; } = 0.34;
         public double BeginningTimePenaltyPower { get; init; } = 0.3;
-        public double BeginningFullPenalty { get; init; } = 0.5;
+        public double BeginningFullPenalty { get; init; } = 0.6;
 
         public double SrScalerY1 { get; init; } = 4.55;
         public double SrScalerY2 { get; init; } = 6.9;
@@ -26,38 +26,38 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double LocalStarRatingMinConstant { get; init; } = 0.8;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.15;
 
-        public double PerformanceLengthLinearPace { get; init; } = 0.34;
+        public double PerformanceLengthLinearPace { get; init; } = 0.32;
         public int PerformanceLengthCutoff { get; init; } = 1700;
         public double PerformanceLengthLogarithmicPace { get; init; } = 0.25;
-        public double PerformanceValueMultiplier { get; init; } = 1.07;
+        public double PerformanceValueMultiplier { get; init; } = 1.03;
 
-        public double PrecisionRawWeightHyperjumps { get; init; } = 0.93;
-        public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.98;
-        public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 0.98;
-        public double PrecisionRawWeightJumps { get; init; } = 1.0;
+        public double PrecisionRawWeightHyperjumps { get; init; } = 0.89;
+        public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.95;
+        public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 0.96;
+        public double PrecisionRawWeightJumps { get; init; } = 0.98;
         public double PrecisionDelayedWeight { get; init; } = 0.85;
 
-        public double PrecisionStrainAmplitude { get; init; } = 40.0;
-        public double PrecisionStrainShift { get; init; } = -15.0;
-        public double PrecisionStrainPace { get; init; } = 25.0;
-        public double PrecisionStrainMultiplier { get; init; } = 39.0;
+        public double PrecisionStrainAmplitude { get; init; } = 44.5;
+        public double PrecisionStrainShift { get; init; } = -8.0;
+        public double PrecisionStrainPace { get; init; } = 33.0;
+        public double PrecisionStrainMultiplier { get; init; } = 41.0;
 
         public double MaxPrecisionCorrection { get; init; } = 1.3;
 
-        public double SpeedSnapAmplitude { get; init; } = 13.0;
-        public double SpeedSnapShift { get; init; } = -50.0;
-        public double SpeedSnapPace { get; init; } = 35.0;
+        public double SpeedSnapAmplitude { get; init; } = 19.1;
+        public double SpeedSnapShift { get; init; } = -10.0;
+        public double SpeedSnapPace { get; init; } = 50.0;
         public double SpeedSnapMultiplier { get; init; } = 0.88;
 
-        public double SpeedBurstAmplitude { get; init; } = 13.0;
-        public double SpeedBurstShift { get; init; } = -50.0;
-        public double SpeedBurstPace { get; init; } = 35.0;
-        public double SpeedBurstMultiplier { get; init; } = 0.99;
+        public double SpeedBurstAmplitude { get; init; } = 19.1;
+        public double SpeedBurstShift { get; init; } = -10.0;
+        public double SpeedBurstPace { get; init; } = 50.0;
+        public double SpeedBurstMultiplier { get; init; } = 1.01;
 
-        public double SpeedConsistencyAmplitude { get; init; } = 13.0;
-        public double SpeedConsistencyShift { get; init; } = -50.0;
-        public double SpeedConsistencyPace { get; init; } = 35.0;
-        public double SpeedConsistencyMultiplier { get; init; } = 1.14;
+        public double SpeedConsistencyAmplitude { get; init; } = 19.1;
+        public double SpeedConsistencyShift { get; init; } = -10.0;
+        public double SpeedConsistencyPace { get; init; } = 52.0;
+        public double SpeedConsistencyMultiplier { get; init; } = 1.1;
 
         public double ReadingHighCsPower { get; init; } = 1.6;
         public double ReadingHighCsRate { get; init; } = 0.39;
