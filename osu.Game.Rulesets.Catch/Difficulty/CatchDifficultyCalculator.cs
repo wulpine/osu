@@ -127,7 +127,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             approachRateFactor = Math.Sqrt(approachRateFactor);
 
-
             // While for DT (clockRate > 1) we want to measure reaction time, for HT (clockRate < 1) we measure difference between moments of note disappearing and being caught
             // That's why we take original AR (instead of adjusted one that is higher) for calculating low AR bonus
             double minApproachRate = Math.Min(approachRate, adjustedApproachRate);
@@ -222,47 +221,45 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             double sr = calculateDifficultyValue(notes, sorted, missCount);
 
-            sr *= tuning.DifficultyMultiplier;
+            // sr *= tuning.DifficultyMultiplier;
 
-            sr = srScaler(sr);
-
-            sr *= 1.06;
+            sr = sr * 0.017186946 + 0.212;
 
             return sr;
         }
 
-        private double srScaler(double sr)
-        {
-            const double x0 = 0.87;
-            const double y0 = 1.7;
+        // private double srScaler(double sr)
+        // {
+        //     const double x0 = 0.87;
+        //     const double y0 = 1.7;
 
-            const double x1 = 4.23;
-            double y1 = tuning.SrScalerY1;
+        //     const double x1 = 4.23;
+        //     double y1 = tuning.SrScalerY1;
 
-            const double x2 = 6.5;
-            double y2 = tuning.SrScalerY2;
+        //     const double x2 = 6.5;
+        //     double y2 = tuning.SrScalerY2;
 
-            const double x3 = 7.5;
-            double y3 = tuning.SrScalerY3;
+        //     const double x3 = 7.5;
+        //     double y3 = tuning.SrScalerY3;
 
-            const double x4 = 8.5;
-            double y4 = tuning.SrScalerY4;
+        //     const double x4 = 8.5;
+        //     double y4 = tuning.SrScalerY4;
 
-            const double x5 = 9.0;
-            double y5 = tuning.SrScalerY5;
+        //     const double x5 = 9.0;
+        //     double y5 = tuning.SrScalerY5;
 
-            const double x6 = 9.5;
-            double y6 = tuning.SrScalerY6;
+        //     const double x6 = 9.5;
+        //     double y6 = tuning.SrScalerY6;
 
-            if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
-            if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
-            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
-            if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
-            if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
-            if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
+        //     if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
+        //     if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
+        //     if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
+        //     if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
+        //     if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
+        //     if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
 
-            return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
-        }
+        //     return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
+        // }
 
         /// <summary>
         /// Replicates StrainSkill behaviour with Strain Peaks.

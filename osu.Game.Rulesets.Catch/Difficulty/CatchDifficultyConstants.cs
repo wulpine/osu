@@ -7,17 +7,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double DifficultyMultiplier { get; init; } = 0.0147;
         public double ApproachRateSecondConstant { get; init; } = 0.34;
         public double BeginningTimePenaltyPower { get; init; } = 0.3;
         public double BeginningFullPenalty { get; init; } = 0.6;
-
-        public double SrScalerY1 { get; init; } = 4.55;
-        public double SrScalerY2 { get; init; } = 6.9;
-        public double SrScalerY3 { get; init; } = 8.7;
-        public double SrScalerY4 { get; init; } = 9.4;
-        public double SrScalerY5 { get; init; } = 10.2;
-        public double SrScalerY6 { get; init; } = 11.0;
 
         public double DefaultDecayWeight { get; init; } = 0.9;
         public double[] DecayWeights { get; init; } = new[] { 0.9, 0.86, 0.81, 0.729, 0.6561 };
@@ -80,5 +72,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionDistanceExponent { get; init; } = 0.75;
         public double PrecisionCorrectionTimeExponent { get; init; } = 1.5;
         public double PrecisionCorrectionDistanceWeight { get; init; } = 0.5;
+        public double FinalPPMultiplier { get; init; } = 1.0;
     }
 }

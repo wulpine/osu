@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return new CatchPerformanceAttributes
             {
                 LengthBonus = lengthBonusPP,
-                Total = value + lengthBonusPP,
+                Total = (value + lengthBonusPP) * tuning.FinalPPMultiplier,
                 Tuning = tuning,
             };
         }
