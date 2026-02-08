@@ -15,12 +15,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
     {
         public static void Process(List<DifficultyHitObject> hitObjects, double catcherWidth, double clockRate, double frameTime, double playfieldBorder, CatchDifficultyConstants tuning)
         {
-            List<CatchDifficultyHitObject> guaranteedActions = new List<CatchDifficultyHitObject>();
-            List<CatchDifficultyHitObject> leftGuaranteedActions = new List<CatchDifficultyHitObject>();
-            List<CatchDifficultyHitObject> rightGuaranteedActions = new List<CatchDifficultyHitObject>();
-            List<CatchDifficultyHitObject> ambiguousActions = new List<CatchDifficultyHitObject>();
-            List<CatchDifficultyHitObject> leftAmbiguousActions = new List<CatchDifficultyHitObject>();
-            List<CatchDifficultyHitObject> rightAmbiguousActions = new List<CatchDifficultyHitObject>();
+            // Track only the most recent actions needed for calculations (last and second-to-last)
+            CatchDifficultyHitObject? lastGuaranteedAction = null;
+            CatchDifficultyHitObject? lastAmbiguousAction = null;
+            CatchDifficultyHitObject? lastLeftGuaranteedAction = null;
+            CatchDifficultyHitObject? secondLastLeftGuaranteedAction = null;
+            CatchDifficultyHitObject? lastRightGuaranteedAction = null;
+            CatchDifficultyHitObject? secondLastRightGuaranteedAction = null;
+            CatchDifficultyHitObject? lastLeftAmbiguousAction = null;
+            CatchDifficultyHitObject? secondLastLeftAmbiguousAction = null;
+            CatchDifficultyHitObject? lastRightAmbiguousAction = null;
+            CatchDifficultyHitObject? secondLastRightAmbiguousAction = null;
             CatchDifficultyHitObject? lastLeftHyper = null;
             CatchDifficultyHitObject? lastRightHyper = null;
             CatchDifficultyHitObject? furthestLeft = null;
@@ -39,28 +44,32 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
                 if (prevData.ActionProbability == 1)
                 {
-                    guaranteedActions.Add(prev);
+                    lastGuaranteedAction = prev;
 
                     if (prevData.KeyPress == MovementKey.Left)
                     {
-                        leftGuaranteedActions.Add(prev);
+                        secondLastLeftGuaranteedAction = lastLeftGuaranteedAction;
+                        lastLeftGuaranteedAction = prev;
                     }
                     else if (prevData.KeyPress == MovementKey.Right)
                     {
-                        rightGuaranteedActions.Add(prev);
+                        secondLastRightGuaranteedAction = lastRightGuaranteedAction;
+                        lastRightGuaranteedAction = prev;
                     }
                 }
                 else if (prevData.ActionProbability > 0.0)
                 {
-                    ambiguousActions.Add(prev);
+                    lastAmbiguousAction = prev;
 
                     if (prevData.KeyPress == MovementKey.Left)
                     {
-                        leftAmbiguousActions.Add(prev);
+                        secondLastLeftAmbiguousAction = lastLeftAmbiguousAction;
+                        lastLeftAmbiguousAction = prev;
                     }
                     else if (prevData.KeyPress == MovementKey.Right)
                     {
-                        rightAmbiguousActions.Add(prev);
+                        secondLastRightAmbiguousAction = lastRightAmbiguousAction;
+                        lastRightAmbiguousAction = prev;
                     }
                 }
 
@@ -252,7 +261,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
                 // Delayed precision
                 double delayed_precision_weight = tuning.PrecisionDelayedWeight;
 
-                CatchDifficultyHitObject? prevAction = guaranteedActions.LastOrDefault() ?? ambiguousActions.LastOrDefault();
+                CatchDifficultyHitObject? prevAction = lastGuaranteedAction ?? lastAmbiguousAction;
 
                 if (prevAction?.MovementData != null && data.PrecisionStrain > 0)
                 {
@@ -263,12 +272,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
                 // Speed calculation
                 var recentGuaranteedDirectionized =
-                    new[] { leftGuaranteedActions.LastOrDefault(), rightGuaranteedActions.LastOrDefault() }
+                    new[] { lastLeftGuaranteedAction, lastRightGuaranteedAction }
                         .Where(n => n is not null)
                         .MaxBy(n => n!.MovementData.EffectiveTime);
 
                 var recentAmbiguousDirectionized =
-                    new[] { leftAmbiguousActions.LastOrDefault(), rightAmbiguousActions.LastOrDefault() }
+                    new[] { lastLeftAmbiguousAction, lastRightAmbiguousAction }
                         .Where(n => n is not null)
                         .MaxBy(n => n!.MovementData.EffectiveTime);
 
@@ -278,14 +287,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
                 if (data.KeyPress == MovementKey.Left)
                 {
-                    burst = calculateSpeed(note, leftGuaranteedActions.LastOrDefault(), leftAmbiguousActions.LastOrDefault(), time => timeToSpeedBurst(time, tuning));
-                    consistency = calculateSpeed(note, leftGuaranteedActions.AsEnumerable().Reverse().Skip(1).FirstOrDefault(), leftAmbiguousActions.AsEnumerable().Reverse().Skip(1).FirstOrDefault(), time => timeToSpeedConsistency(time, tuning));
+                    burst = calculateSpeed(note, lastLeftGuaranteedAction, lastLeftAmbiguousAction, time => timeToSpeedBurst(time, tuning));
+                    consistency = calculateSpeed(note, secondLastLeftGuaranteedAction, secondLastLeftAmbiguousAction, time => timeToSpeedConsistency(time, tuning));
                     snap = calculateSpeed(note, recentGuaranteedDirectionized, recentAmbiguousDirectionized, time => timeToSpeedSnap(time, tuning));
                 }
                 else if (data.KeyPress == MovementKey.Right)
                 {
-                    burst = calculateSpeed(note, rightGuaranteedActions.LastOrDefault(), rightAmbiguousActions.LastOrDefault(), time => timeToSpeedBurst(time, tuning));
-                    consistency = calculateSpeed(note, rightGuaranteedActions.AsEnumerable().Reverse().Skip(1).FirstOrDefault(), leftAmbiguousActions.AsEnumerable().Reverse().Skip(1).FirstOrDefault(), time => timeToSpeedConsistency(time, tuning));
+                    burst = calculateSpeed(note, lastRightGuaranteedAction, lastRightAmbiguousAction, time => timeToSpeedBurst(time, tuning));
+                    consistency = calculateSpeed(note, secondLastRightGuaranteedAction, secondLastRightAmbiguousAction, time => timeToSpeedConsistency(time, tuning));
                     snap = calculateSpeed(note, recentGuaranteedDirectionized, recentAmbiguousDirectionized, time => timeToSpeedSnap(time, tuning));
                 }
 

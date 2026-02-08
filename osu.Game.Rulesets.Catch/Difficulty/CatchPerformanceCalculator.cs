@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.2 * catchAttributes.MaxCombo;
 
             double linear_pace = tuning.PerformanceLengthLinearPace;
-            int cutoff = tuning.PerformanceLengthCutoff;
+            double cutoff = tuning.PerformanceLengthCutoff;
             double logarithmic_pace = tuning.PerformanceLengthLogarithmicPace;
 
             double lengthBonus =

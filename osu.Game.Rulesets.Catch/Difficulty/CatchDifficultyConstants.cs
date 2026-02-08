@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.15;
 
         public double PerformanceLengthLinearPace { get; init; } = 0.32;
-        public int PerformanceLengthCutoff { get; init; } = 1700;
+        public double PerformanceLengthCutoff { get; init; } = 1700;
         public double PerformanceLengthLogarithmicPace { get; init; } = 0.25;
         public double PerformanceValueMultiplier { get; init; } = 1.03;
 
