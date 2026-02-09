@@ -223,13 +223,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // sr *= tuning.DifficultyMultiplier;
 
-            sr = sr * 0.017186946 + 0.212;
-
-            sr *= Math.Sqrt(0.28220449436285);
+            sr = sr * 0.012;
 
             sr = srScaler(sr);
-
-            sr *= Math.Sqrt(0.9899222776805546);
 
             return sr;
         }

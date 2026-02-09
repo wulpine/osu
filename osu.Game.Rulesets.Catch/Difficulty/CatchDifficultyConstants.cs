@@ -7,69 +7,85 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double SrScalerY0 { get; init; } = 1.2313747100775727;
-        public double SrScalerY1 { get; init; } = 2.4211471543352423;
-        public double SrScalerY2 { get; init; } = 3.407688849445905;
-        public double SrScalerY3 { get; init; } = 4.45678214970642;
-        public double SrScalerY4 { get; init; } = 5.211931360115707;
-        public double SrScalerY5 { get; init; } = 5.995980022953021;
-        public double SrScalerY6 { get; init; } = 6.8957734116772045;
-        public double SrScalerY7 { get; init; } = 8.105141125150286;
-        public double SrScalerY8 { get; init; } = 9.132852882177305;
-        public double SrScalerY9 { get; init; } = 9.853216491684144;
-        public double SrScalerY10 { get; init; } = 10.664611685083269;
-        public double ApproachRateSecondConstant { get; init; } = 0.43250312085515485;
-        public double BeginningTimePenaltyPower { get; init; } = 0.42483720068639547;
-        public double BeginningFullPenalty { get; init; } = 0.6147783618526128;
+        public double SrScalerY0 { get; init; } = 1.0;
+        public double SrScalerY1 { get; init; } = 2.0;
+        public double SrScalerY2 { get; init; } = 3.0;
+        public double SrScalerY3 { get; init; } = 4.0;
+        public double SrScalerY4 { get; init; } = 5.0;
+        public double SrScalerY5 { get; init; } = 6.0;
+        public double SrScalerY6 { get; init; } = 7.0;
+        public double SrScalerY7 { get; init; } = 8.0;
+        public double SrScalerY8 { get; init; } = 9.0;
+        public double SrScalerY9 { get; init; } = 10.0;
+        public double SrScalerY10 { get; init; } = 11.0;
+
+        public double SrOffset { get; init; } = 0.212;
+
+        public double ApproachRateSecondConstant { get; init; } = 0.4;
+        public double BeginningTimePenaltyPower { get; init; } = 0.3;
+        public double BeginningFullPenalty { get; init; } = 0.6;
+
         public double DefaultDecayWeight { get; init; } = 0.9;
         public double[] DecayWeights { get; init; } = new[] { 0.9, 0.86, 0.81, 0.729, 0.6561 };
-        public double LocalStarRatingMaxConstant { get; init; } = 1.9314907095826686;
-        public double LocalStarRatingMinConstant { get; init; } = 0.9758189456714981;
-        public double LocalStarRatingCorrelationConstant { get; init; } = 0.4397797709011138;
-        public double PerformanceLengthLinearPace { get; init; } = 0.30442696917090545;
-        public double PerformanceLengthCutoff { get; init; } = 1700.1788586428409;
-        public double PerformanceLengthLogarithmicPace { get; init; } = 0.5376645372408155;
-        public double PerformanceValueMultiplier { get; init; } = 1.0944609676968209;
-        public double PrecisionRawWeightHyperjumps { get; init; } = 0.9441731633277796;
-        public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.9516816791224951;
-        public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 0.9984613564016297;
-        public double PrecisionRawWeightJumps { get; init; } = 0.913682080259714;
-        public double PrecisionDelayedWeight { get; init; } = 0.6410954003324065;
-        public double PrecisionStrainAmplitude { get; init; } = 74.59263538660932;
-        public double PrecisionStrainShift { get; init; } = 2.7182894245805485;
-        public double PrecisionStrainPace { get; init; } = 26.679985010385373;
-        public double PrecisionStrainMultiplier { get; init; } = 41.411459850915236;
-        public double MaxPrecisionCorrection { get; init; } = 1.6950508806286932;
-        public double SpeedSnapAmplitude { get; init; } = 15.638791496156156;
-        public double SpeedSnapShift { get; init; } = -43.23567365216375;
-        public double SpeedSnapPace { get; init; } = 52.05882397767609;
-        public double SpeedSnapMultiplier { get; init; } = 0.9922824003753967;
-        public double SpeedBurstAmplitude { get; init; } = 9.040324988798575;
-        public double SpeedBurstShift { get; init; } = -28.91121405285478;
-        public double SpeedBurstPace { get; init; } = 68.65374996316815;
-        public double SpeedBurstMultiplier { get; init; } = 1.5473795583084686;
-        public double SpeedConsistencyAmplitude { get; init; } = 25.286020624263372;
-        public double SpeedConsistencyShift { get; init; } = 19.50740310238877;
-        public double SpeedConsistencyPace { get; init; } = 47.58333687026297;
-        public double SpeedConsistencyMultiplier { get; init; } = 1.0386359349408476;
-        public double ReadingHighCsPower { get; init; } = 1.5225426734566225;
-        public double ReadingHighCsRate { get; init; } = 0.47973363422473014;
-        public double ReadingHighCsPenaltyHypers { get; init; } = 0.6349494522506675;
-        public double ReadingLocalRhythmPenalty { get; init; } = 0.8707416071932552;
-        public double ReadingExplicitRhythmPenalty { get; init; } = 0.9310414856444548;
-        public double ReadingImplicitRhythmPenalty { get; init; } = 0.8481770816270627;
-        public double ReadingSimilarDistancePenalty { get; init; } = 0.8304374055690238;
-        public double ReadingAlternatingDistancePenalty { get; init; } = 0.8518173579708035;
-        public double ReadingHyperchainPenalty { get; init; } = 0.9507072783446766;
-        public double ReadingNonHyperchainPenalty { get; init; } = 0.956115307398902;
-        public double ReadingHighVelocityNerf { get; init; } = 0.0011260557104272872;
-        public double ReadingHighDistanceBuff { get; init; } = 0.18149033898534875;
-        public double ReadingFakeActionBuff { get; init; } = 1.0459020650700555;
-        public double ReadingFuturePrecisionBuff { get; init; } = 0.1289137212417447;
-        public double StandingWidthAdditiveConstant { get; init; } = 1.2839078826556656;
-        public double PrecisionCorrectionDistanceExponent { get; init; } = 0.7760320589694504;
-        public double PrecisionCorrectionTimeExponent { get; init; } = 0.7230909398414097;
-        public double PrecisionCorrectionDistanceWeight { get; init; } = 0.10657478984392157;
+
+        public double LocalStarRatingMaxConstant { get; init; } = 1.0;
+        public double LocalStarRatingMinConstant { get; init; } = 0.8;
+        public double LocalStarRatingCorrelationConstant { get; init; } = 0.15;
+
+        public double PerformanceLengthLinearPace { get; init; } = 0.32;
+        public double PerformanceLengthCutoff { get; init; } = 1700;
+        public double PerformanceLengthLogarithmicPace { get; init; } = 0.25;
+        public double PerformanceValueMultiplier { get; init; } = 1.03;
+
+        public double PrecisionRawWeightHyperjumps { get; init; } = 0.89;
+        public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.95;
+        public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 1.00;
+        public double PrecisionRawWeightJumps { get; init; } = 0.98;
+        public double PrecisionDelayedWeight { get; init; } = 0.85;
+
+        public double PrecisionStrainAmplitude { get; init; } = 44.5;
+        public double PrecisionStrainShift { get; init; } = -8.0;
+        public double PrecisionStrainPace { get; init; } = 33.0;
+        public double PrecisionStrainMultiplier { get; init; } = 41.0;
+
+        public double MaxPrecisionCorrection { get; init; } = 1.3;
+
+        public double SpeedSnapAmplitude { get; init; } = 19.1;
+        public double SpeedSnapShift { get; init; } = -10.0;
+        public double SpeedSnapPace { get; init; } = 50.0;
+        public double SpeedSnapMultiplier { get; init; } = 0.88;
+
+        public double SpeedBurstAmplitude { get; init; } = 19.1;
+        public double SpeedBurstShift { get; init; } = -10.0;
+        public double SpeedBurstPace { get; init; } = 50.0;
+        public double SpeedBurstMultiplier { get; init; } = 1.01;
+
+        public double SpeedConsistencyAmplitude { get; init; } = 19.1;
+        public double SpeedConsistencyShift { get; init; } = -10.0;
+        public double SpeedConsistencyPace { get; init; } = 52.0;
+        public double SpeedConsistencyMultiplier { get; init; } = 1.1;
+
+        public double ReadingHighCsPower { get; init; } = 1.6;
+        public double ReadingHighCsRate { get; init; } = 0.39;
+        public double ReadingHighCsPenaltyHypers { get; init; } = 0.75;
+
+        public double ReadingLocalRhythmPenalty { get; init; } = 0.95;
+        public double ReadingExplicitRhythmPenalty { get; init; } = 0.93;
+        public double ReadingImplicitRhythmPenalty { get; init; } = 1.0;
+        public double ReadingSimilarDistancePenalty { get; init; } = 0.85;
+        public double ReadingAlternatingDistancePenalty { get; init; } = 0.98;
+        public double ReadingHyperchainPenalty { get; init; } = 0.92;
+        public double ReadingNonHyperchainPenalty { get; init; } = 0.96;
+        public double ReadingHighVelocityNerf { get; init; } = 0.13;
+        public double ReadingHighDistanceBuff { get; init; } = 0.15;
+        public double ReadingFakeActionBuff { get; init; } = 1.0;
+        public double ReadingFuturePrecisionBuff { get; init; } = 0.15;
+
+        public double StandingWidthAdditiveConstant { get; init; } = 1.25;
+
+        public double PrecisionCorrectionDistanceExponent { get; init; } = 0.75;
+        public double PrecisionCorrectionTimeExponent { get; init; } = 1.5;
+        public double PrecisionCorrectionDistanceWeight { get; init; } = 0.5;
         public double FinalPPMultiplier { get; init; } = 1.0;
     }
 }
