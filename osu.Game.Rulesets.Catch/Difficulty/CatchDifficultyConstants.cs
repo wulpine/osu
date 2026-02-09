@@ -70,6 +70,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionDistanceExponent { get; init; } = 0.7760320589694504;
         public double PrecisionCorrectionTimeExponent { get; init; } = 0.7230909398414097;
         public double PrecisionCorrectionDistanceWeight { get; init; } = 0.10657478984392157;
-        public double FinalPPMultiplier { get; init; } = 0.28220449436285;
+        public double FinalPPMultiplier { get; init; } = 1.0;
     }
 }
