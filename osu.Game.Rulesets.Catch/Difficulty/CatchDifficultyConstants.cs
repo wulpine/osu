@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
+        public double SrPreMultiplier { get; init; } = 0.012;
+
         public double SrScalerY0 { get; init; } = 1.0;
         public double SrScalerY1 { get; init; } = 2.0;
         public double SrScalerY2 { get; init; } = 3.0;
