@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = sr * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier),
+                StarRating = sr * approachRateFactor * hiddenFactor,
                 Mods = mods,
                 MaxCombo = beatmap.GetMaxCombo(),
                 TotalActions = totalActions,
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 HiddenFactor = hiddenFactor,
                 // PrecisionSR = precision,
                 // SpeedSR = speed,
-                SRBeginningNerfed = srBeginningNerfed * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier),
+                SRBeginningNerfed = srBeginningNerfed * approachRateFactor * hiddenFactor,
                 Tuning = tuning,
             };
 
@@ -225,41 +225,61 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr = sr * 0.017186946 + 0.212;
 
+            sr *= Math.Sqrt(0.28220449436285);
+
+            sr = srScaler(sr);
+
             return sr;
         }
 
-        // private double srScaler(double sr)
-        // {
-        //     const double x0 = 0.87;
-        //     const double y0 = 1.7;
+        private double srScaler(double sr)
+        {
+            const double x0 = 1.0;
+            const double y0 = tuning.SrScalerY0;
 
-        //     const double x1 = 4.23;
-        //     double y1 = tuning.SrScalerY1;
+            const double x1 = 2.0;
+            double y1 = tuning.SrScalerY1;
 
-        //     const double x2 = 6.5;
-        //     double y2 = tuning.SrScalerY2;
+            const double x2 = 3.0;
+            double y2 = tuning.SrScalerY2;
 
-        //     const double x3 = 7.5;
-        //     double y3 = tuning.SrScalerY3;
+            const double x3 = 4.0;
+            double y3 = tuning.SrScalerY3;
 
-        //     const double x4 = 8.5;
-        //     double y4 = tuning.SrScalerY4;
+            const double x4 = 5.0;
+            double y4 = tuning.SrScalerY4;
 
-        //     const double x5 = 9.0;
-        //     double y5 = tuning.SrScalerY5;
+            const double x5 = 6.0;
+            double y5 = tuning.SrScalerY5;
 
-        //     const double x6 = 9.5;
-        //     double y6 = tuning.SrScalerY6;
+            const double x6 = 7.0;
+            double y6 = tuning.SrScalerY6;
 
-        //     if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
-        //     if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
-        //     if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
-        //     if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
-        //     if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
-        //     if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
+            const double x7 = 8.0;
+            double y7 = tuning.SrScalerY7
 
-        //     return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
-        // }
+            const double x8 = 9.0;
+            double y8 = tuning.SrScalerY8;
+
+            const double x9 = 10.0;
+            double y9 = tuning.SrScalerY9;
+
+            const double x10 = 11.0;
+            double y10 = tuning.SrScalerY10;
+
+            if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
+            if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
+            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
+            if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
+            if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
+            if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
+            if (sr <= x6) return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
+            if (sr <= x7) return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
+            if (sr <= x8) return CatchPreprocessingUtils.Lerp(sr, x7, y7, x8, y8);
+            if (sr <= x9) return CatchPreprocessingUtils.Lerp(sr, x8, y8, x9, y9);
+
+            return CatchPreprocessingUtils.Lerp(sr, x9, y9, x10, y10);
+        }
 
         /// <summary>
         /// Replicates StrainSkill behaviour with Strain Peaks.
