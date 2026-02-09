@@ -7,17 +7,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double SrScalerY0 { get; init; } = 1.0;
-        public double SrScalerY1 { get; init; } = 2.0;
-        public double SrScalerY2 { get; init; } = 3.0;
-        public double SrScalerY3 { get; init; } = 4.0;
-        public double SrScalerY4 { get; init; } = 5.0;
-        public double SrScalerY5 { get; init; } = 6.0;
-        public double SrScalerY6 { get; init; } = 7.0;
-        public double SrScalerY7 { get; init; } = 8.0;
-        public double SrScalerY8 { get; init; } = 9.0;
-        public double SrScalerY9 { get; init; } = 10.0;
-        public double SrScalerY10 { get; init; } = 11.0;
+        public double SrScalerY0 { get; init; } = 1.2313747100775727;
+        public double SrScalerY1 { get; init; } = 2.4211471543352423;
+        public double SrScalerY2 { get; init; } = 3.407688849445905;
+        public double SrScalerY3 { get; init; } = 4.45678214970642;
+        public double SrScalerY4 { get; init; } = 5.211931360115707;
+        public double SrScalerY5 { get; init; } = 5.995980022953021;
+        public double SrScalerY6 { get; init; } = 6.8957734116772045;
+        public double SrScalerY7 { get; init; } = 8.105141125150286;
+        public double SrScalerY8 { get; init; } = 9.132852882177305;
+        public double SrScalerY9 { get; init; } = 9.853216491684144;
+        public double SrScalerY10 { get; init; } = 10.664611685083269;
         public double ApproachRateSecondConstant { get; init; } = 0.43250312085515485;
         public double BeginningTimePenaltyPower { get; init; } = 0.42483720068639547;
         public double BeginningFullPenalty { get; init; } = 0.6147783618526128;

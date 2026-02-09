@@ -229,6 +229,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr = srScaler(sr);
 
+            sr *= Math.Sqrt(0.9899222776805546);
+
             return sr;
         }
 
