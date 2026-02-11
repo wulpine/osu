@@ -160,7 +160,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {
-                StarRating = sr * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier),
+                StarRating = sr * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier),
                 Mods = mods,
                 MaxCombo = beatmap.GetMaxCombo(),
                 TotalActions = totalActions,
@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 HiddenFactor = hiddenFactor,
                 // PrecisionSR = precision,
                 // SpeedSR = speed,
-                SRBeginningNerfed = srBeginningNerfed * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier),
+                SRBeginningNerfed = srBeginningNerfed * approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier),
                 Tuning = tuning,
             };
 
