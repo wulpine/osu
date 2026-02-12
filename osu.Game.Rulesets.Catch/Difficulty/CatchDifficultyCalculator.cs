@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr *= 0.017;
 
-            sr = sr * tuning.SrPreMultiplier;
+            sr = sr * tuning.SrPreMultiplier + tuning.SrOffset;
 
             sr = srScaler(sr);
 

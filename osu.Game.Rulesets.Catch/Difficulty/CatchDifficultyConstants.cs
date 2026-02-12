@@ -7,19 +7,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double SrPreMultiplier { get; init; } =  0.7832023921381424;
-        public double SrScalerY0 { get; init; } =  0.8759777562552482;
-        public double SrScalerY1 { get; init; } =  1.8285863061868888;
-        public double SrScalerY2 { get; init; } =  3.49813387527634;
-        public double SrScalerY3 { get; init; } =  4.343541009238826;
-        public double SrScalerY4 { get; init; } =  4.965539802568557;
-        public double SrScalerY5 { get; init; } =  5.81471788081099;
-        public double SrScalerY6 { get; init; } =  7.1345211790964775;
-        public double SrScalerY7 { get; init; } =  8.495090487529616;
-        public double SrScalerY8 { get; init; } =  8.978933881787196;
-        public double SrScalerY9 { get; init; } =  9.50704162413777;
-        public double SrScalerY10 { get; init; } =  10.507694514645852;
-        public double SrOffset { get; init; } =  0.212;
+        public double SrPreMultiplier { get; init; } = 1.0;
+        public double SrScalerY0 { get; init; } = 1.0;
+        public double SrScalerY1 { get; init; } = 2.0;
+        public double SrScalerY2 { get; init; } = 3.0;
+        public double SrScalerY3 { get; init; } = 4.0;
+        public double SrScalerY4 { get; init; } = 5.0;
+        public double SrScalerY5 { get; init; } = 6.0;
+        public double SrScalerY6 { get; init; } = 7.0;
+        public double SrScalerY7 { get; init; } = 8.0;
+        public double SrScalerY8 { get; init; } = 9.0;
+        public double SrScalerY9 { get; init; } = 10.0;
+        public double SrScalerY10 { get; init; } = 11.0;
+        public double SrOffset { get; init; } = 0.0;
         public double ApproachRateSecondConstant { get; init; } =  0.43494946766265297;
         public double BeginningTimePenaltyPower { get; init; } =  0.36221558435389;
         public double BeginningFullPenalty { get; init; } =  0.6720686852002504;
@@ -72,6 +72,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionDistanceExponent { get; init; } =  0.6831795506993774;
         public double PrecisionCorrectionTimeExponent { get; init; } =  0.634707037357876;
         public double PrecisionCorrectionDistanceWeight { get; init; } =  0.10063662622031824;
-        public double FinalPPMultiplier { get; init; } =  1.059497223924349;
+        public double FinalPPMultiplier { get; init; } =  1.0;
     }
 }
