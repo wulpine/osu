@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double BeginningFullPenalty { get; init; } = 0.5;
 
         public double DefaultDecayWeight { get; init; } = 0.9;
-        public double[] DecayWeights { get; init; } = new[] { 0.9, 0.86, 0.81, 0.729, 0.6561 };
+        public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
 
         public double LocalStarRatingMaxConstant { get; init; } = 1.05;
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
