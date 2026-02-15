@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             nonHyperchainPenalty(actionNotes, tuning);
             highVelocityNerf(cdhos, frameTime, tuning);
             highDistanceBuff(actionNotes, clockRate, tuning);
-            densityBuff(cdhos);
+            // densityBuff(cdhos);
             fakeActionBuff(actionNotes, tuning);
             futurePrecisionBuff(cdhos, tuning);
         }
