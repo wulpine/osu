@@ -111,8 +111,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double second_threshold = 10.15; //adjusted AR for AR9+DT
             const double third_threshold = 11.0;
 
-            const double first_power = 1.8;
-            const double second_power = 1.2;
+            const double first_power = 1.9;
+            const double second_power = 1.15;
             const double first_constant = 0.1;
             double second_constant = tuning.ApproachRateSecondConstant;
             const double third_constant = 0.15; // Additional bonus for FL (starting at around AR8) or Lazer's extended AR scale
@@ -159,9 +159,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             double combinedMultiplier = approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
-            combinedMultiplier *= clockRate >= 1.0
-                ? (1.0 - (Math.Max(clockRate - 1.0, 0.0) / 0.5 * tuning.DoubleTimeNerf))
-                : (1.0 + (Math.Max(1.0 - clockRate, 0.0) / 0.25 * tuning.HalfTimeBuff));
+            if (clockRate >= 1.0)
+                combinedMultiplier *= 1.0 - 2.0 * tuning.DoubleTimeNerf * (clockRate - 1.0);
+            else if (clockRate > 0.0)
+                combinedMultiplier *= 1.0 + 2.0 * tuning.DoubleTimeNerf * (1.0 / clockRate - 1.0);
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {

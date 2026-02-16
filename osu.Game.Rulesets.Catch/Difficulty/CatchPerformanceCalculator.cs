@@ -81,10 +81,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 (totalActions > cutoff ? Math.Log10(totalActions / cutoff) * logarithmic_pace : 0.0);
 
             // Length bonus should depend on approachRate (including FlashLight): if it's high enough, it's either draining or it requires memorisation
-            lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.5) / 2.0);
+            lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
 
             if (score.Mods.Any(m => m is ModFlashlight))
-                lengthBonus = Math.Pow(lengthBonus, 2.0);
+                lengthBonus = Math.Pow(lengthBonus, 1.9);
 
             value *= Math.Pow(accuracy(), 5.5);
 
