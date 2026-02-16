@@ -159,7 +159,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             double combinedMultiplier = approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
-            combinedMultiplier *= (1.0 - (Math.Max(clockRate - 1.0, 0.0) / 0.5 * tuning.DoubleTimeNerf));
+            combinedMultiplier *= clockRate >= 1.0
+                ? (1.0 - (Math.Max(clockRate - 1.0, 0.0) / 0.5 * tuning.DoubleTimeNerf))
+                : (1.0 + (Math.Max(1.0 - clockRate, 0.0) / 0.25 * tuning.HalfTimeBuff));
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {

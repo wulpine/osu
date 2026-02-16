@@ -7,7 +7,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double DoubleTimeNerf = 0.1;
+        public double DoubleTimeNerf = 0.05;
+        public double HalfTimeBuff = 0.05;
 
         public double SrPreMultiplier { get; init; } = 1.0;
         public double SrPostMultiplier { get; init; } = 1.06;
