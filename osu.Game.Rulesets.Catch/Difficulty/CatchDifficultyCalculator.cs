@@ -240,26 +240,30 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private double srScaler(double sr)
         {
-            const double x0 = 0.87;
-            const double y0 = 1.7;
+            const double x0 = 0.3;
+            const double y0 = 2.0;
 
-            const double x1 = 4.23;
-            const double y1 = 4.55;
+            const double x1 = 2.5;
+            const double y1 = 3.3;
 
-            const double x2 = 6.5;
-            const double y2 = 6.9;
+            const double x2 = 4.2;
+            const double y2 = 4.5;
 
-            const double x3 = 7.5;
-            const double y3 = 8.7;
+            const double x3 = 6.5;
+            const double y3 = 6.9;
 
-            const double x4 = 8.5;
-            const double y4 = 9.4;
+            const double x4 = 7.5;
+            const double y4 = 8.7;
 
-            const double x5 = 9.0;
-            const double y5 = 10.2;
+            const double x5 = 8.5;
+            const double y5 = 9.4;
 
-            const double x6 = 9.5;
-            const double y6 = 11.0;
+            const double x6 = 9.0;
+            const double y6 = 10.2;
+
+            const double x7 = 9.5;
+            const double y7 = 11.0;
+
 
             if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
             if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
@@ -267,8 +271,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
             if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
             if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
+            if (sr <= x6) return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
 
-            return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
+            return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
         }
 
         /// <summary>
