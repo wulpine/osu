@@ -311,11 +311,23 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             double pace = tuning.PrecisionStrainPace; //measures how fast strain decreases between easy and hard jumps
             double multiplier = tuning.PrecisionStrainMultiplier;
 
-            double precision = note.MovementData.NotePrecision is null
-                ? 0
-                : 1.0 + amplitude / (1 + Math.Exp(((double)note.MovementData.NotePrecision + shift) / pace));
+            const double high_precision_threshold = 30.0;
+            const double high_precision_pace = 2.7;
+            const double high_precision_power = 1.5;
 
-            return precision / 18 * multiplier;
+            double? precision = note.MovementData.NotePrecision;
+            if (precision is null)
+                return 0;
+
+            double precision_value = precision.Value;
+
+            double precision_strain = (1.0 + amplitude / (1 + Math.Exp((precision_value + shift) / pace))) * multiplier;
+
+            // // Bonus for very precise notes (pixel jump buff)
+            if (precision_value < high_precision_threshold)
+                precision_strain += 10.0 * Math.Pow((high_precision_threshold - precision_value) / high_precision_pace, high_precision_power);
+
+            return precision_strain / 18;
         }
 
         /// <summary>
