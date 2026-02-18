@@ -7,8 +7,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double DoubleTimeNerf = 0.025;
-        public double HalfTimeBuff = 0.05;
+        public double LowSpeedThresholdLSR { get; init; } = 10.0;
+        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.7;
 
         public double SrPreMultiplier { get; init; } = 1.0;
         public double SrPostMultiplier { get; init; } = 0.88;
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double DefaultDecayWeight { get; init; } = 0.902;
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
 
-        public double LocalStarRatingMaxConstant { get; init; } = 1.05;
+        public double LocalStarRatingMaxConstant { get; init; } = 1.06;
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.18;
 
@@ -45,10 +45,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionRawWeightJumps { get; init; } = 0.98;
         public double PrecisionDelayedWeight { get; init; } = 0.95;
 
-        public double PrecisionStrainAmplitude { get; init; } = 44.5;
-        public double PrecisionStrainShift { get; init; } = -8.0;
-        public double PrecisionStrainPace { get; init; } = 33.0;
-        public double PrecisionStrainMultiplier { get; init; } = 41.0;
+        public double PrecisionStrainAmplitude { get; init; } = 33.2;
+        public double PrecisionStrainShift { get; init; } = -7.0;
+        public double PrecisionStrainPace { get; init; } = 35.0;
+        public double PrecisionStrainMultiplier { get; init; } = 52.0;
+
+        public double HighPrecisionThreshold { get; init; }  = 30.0;
+        public double HighPrecisionPace { get; init; } = 2.7;
+        public double HighPrecisionPower { get; init; } = 1.5;
 
         public double MaxPrecisionCorrection { get; init; } = 1.3;
 
@@ -88,6 +92,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionDistanceExponent { get; init; } = 0.6;
         public double PrecisionCorrectionTimeExponent { get; init; } = 1.25;
         public double PrecisionCorrectionDistanceWeight { get; init; } = 0.3;
+
+        public double DoubleTimeNerf = 0.035;
+        public double HalfTimeBuff = 0.05;
+
         public double FinalPPMultiplier { get; init; } = 1.46;
     }
 }
