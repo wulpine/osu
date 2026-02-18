@@ -7,9 +7,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
-        public double LowSpeedThresholdLSR { get; init; } = 10.0;
-        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.7;
-
         public double SrPreMultiplier { get; init; } = 1.0;
         public double SrPostMultiplier { get; init; } = 0.88;
         public double SrScalerY0 { get; init; } = 1.7;
@@ -28,6 +25,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double DefaultDecayWeight { get; init; } = 0.902;
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
+
+        public double LowSpeedThresholdLSR { get; init; } = 10.0;
+        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.75;
 
         public double LocalStarRatingMaxConstant { get; init; } = 1.06;
         public double LocalStarRatingMinConstant { get; init; } = 0.85;

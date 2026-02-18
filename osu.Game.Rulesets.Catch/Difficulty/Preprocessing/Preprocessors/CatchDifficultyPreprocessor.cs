@@ -311,9 +311,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             double pace = tuning.PrecisionStrainPace; //measures how fast strain decreases between easy and hard jumps
             double multiplier = tuning.PrecisionStrainMultiplier;
 
-            const double high_precision_threshold = 30.0;
-            const double high_precision_pace = 2.7;
-            const double high_precision_power = 1.5;
+            double high_precision_threshold = tuning.HighPrecisionThreshold;
+            double high_precision_pace = tuning.HighPrecisionPace;
+            double high_precision_power = tuning.HighPrecisionPower;
 
             double? precision = note.MovementData.NotePrecision;
             if (precision is null)

@@ -399,13 +399,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, CatchDifficultyConstants tuning)
         {
-            const double low_speed_threshold = 10.0;
-            const double unaffected_percentage = 0.7;
+            double low_speed_threshold = tuning.LowSpeedThresholdLSR;
+            double unaffected_percentage = tuning.UnaffectedPercantagePrecisionLSR;
 
             // "Low diffs +HR nerf": the purpose is to nerf precise notes supposing the pattern is sufficiently slow
             // Example of the affected map: 2696377 +HR
-            if (speedStrain < low_speed_threshold)
-                precisionStrain = precisionStrain * (unaffected_percentage + (1.0 - unaffected_percentage) * speedStrain / low_speed_threshold);
+            if (speedStrain < tuning.LowSpeedThresholdLSR)
+                precisionStrain = precisionStrain * (tuning.UnaffectedPercantagePrecisionLSR + (1.0 - tuning.UnaffectedPercantagePrecisionLSR) * speedStrain / tuning.LowSpeedThresholdLSR);
 
             return tuning.LocalStarRatingMaxConstant * Math.Max(precisionStrain, speedStrain)
                    + tuning.LocalStarRatingMinConstant * Math.Min(precisionStrain, speedStrain)
