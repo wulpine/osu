@@ -220,7 +220,18 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             List<(double, double)> sorted = notes.OrderByDescending(n => n.Item2).ToList();
 
-            return calculateSr(notes, sorted, missCount);
+            // Parameters has been chosen with pp values in mind; to make SR->pp scaling similar to old one, we are scaling it once more.
+            // This part doesn't affect pp values: in fact, only SR with nerf beginning is taken into account there.
+            // The purpose of the SR below is only to show players how difficult patterns in the map are, which shouldn't depend on the map's length.
+            const double multiplier_to_show = 0.9;
+
+            double sr = calculateSr(notes, sorted, missCount);
+            if (sr == 0.0)
+                return 0.0;
+            
+            double multiplier = sr < 5.0 ? 1.0 - (1.0 - multiplier_to_show) * Math.Pow(sr / 5.0, 2.0) : multiplier_to_show;
+
+            return sr * multiplier;
         }
 
         private double calculateSr(List<(double, double)> notes, List<(double, double)> sorted, int missCount = 0)
@@ -241,9 +252,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private double srScaler(double sr)
         {
             const double x0 = 0.3;
-            const double y0 = 2.0;
+            const double y0 = 2.3;
 
-            const double x1 = 2.5;
+            const double x1 = 2.3;
             const double y1 = 3.3;
 
             const double x2 = 4.2;
