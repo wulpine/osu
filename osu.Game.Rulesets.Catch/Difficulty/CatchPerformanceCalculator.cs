@@ -70,7 +70,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Longer maps are worth more. "Longer" means how many hits there are approximately
             // We add some undetected actions approximated with 20% of the maximum combo
-            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.25 * catchAttributes.MaxCombo;
+            double maxCombo = catchAttributes.MaxCombo;
+            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.25 * maxCombo;
 
             double linear_pace = tuning.PerformanceLengthLinearPace;
             double cutoff = tuning.PerformanceLengthCutoff;
@@ -84,7 +85,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
 
             if (score.Mods.Any(m => m is ModFlashlight))
-                lengthBonus = Math.Pow(lengthBonus, 1.9);
+            {
+                if (score.Mods.Any(m => m is ModHidden))
+                    lengthBonus = Math.Pow(lengthBonus, 2.8);
+                else
+                    lengthBonus = Math.Pow(lengthBonus, 2.0);
+            }
+
+            const double unaffected_percentage_pp_fl = 0.2;
+            const double full_fl_bonus = 225;
+            if (maxCombo <= 225 && score.Mods.Any(m => m is ModFlashlight))
+                value = unaffected_percentage_pp_fl * value + (1-unaffected_percentage_pp_fl) * value * maxCombo / 225.0;
 
             value *= Math.Pow(accuracy(), 5.5);
 

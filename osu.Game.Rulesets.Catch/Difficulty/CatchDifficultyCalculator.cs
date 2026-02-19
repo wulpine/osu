@@ -115,17 +115,32 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double second_power = 1.15;
             const double first_constant = 0.1;
             double second_constant = tuning.ApproachRateSecondConstant;
-            const double third_constant = 0.15; // Additional bonus for FL (starting at around AR8) or Lazer's extended AR scale
+            const double third_constant = 0.1; // Additional bonus for FL (starting at around AR8) or Lazer's extended AR scale
 
             double approachRateFactor = 1.0;
-            if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
-                approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
-            if (adjustedApproachRate >= second_threshold)
-                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
-            if (adjustedApproachRate > third_threshold)
-                approachRateFactor += third_constant * (adjustedApproachRate - 11.0);
 
-            approachRateFactor = Math.Sqrt(approachRateFactor);
+            if (!mods.Any(m => m is ModFlashlight))
+            {
+                if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
+                    approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
+                if (adjustedApproachRate >= second_threshold)
+                    approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
+                if (adjustedApproachRate > third_threshold)
+                    approachRateFactor += third_constant * (adjustedApproachRate - 11.0);
+                approachRateFactor = Math.Sqrt(approachRateFactor);
+            }
+            else
+            {
+                const double first_fl_threshold = 8.5;
+                const double first_fl_constant = 0.1;
+                const double second_fl_threshold = 9.5;
+                const double second_fl_constant = 10.5;
+                if (adjustedApproachRate >= second_fl_constant)
+                    approachRateFactor = 1.2 + 0.14 * (Math.Min(12.0, adjustedApproachRate) - 10.5);
+                else if (adjustedApproachRate >= first_threshold)
+                    approachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_threshold);
+            }
+
 
             // While for DT (clockRate > 1) we want to measure reaction time, for HT (clockRate < 1) we measure difference between moments of note disappearing and being caught
             // That's why we take original AR (instead of adjusted one that is higher) for calculating low AR bonus
@@ -144,7 +159,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double hidden_growth = 0.235; // Value determining AR bonus at threshold_linear (and pace of growth of the function for higher AR values)
             const double hidden_power = 1.65;
 
-            if (mods.Any(m => m is ModHidden))
+            if (mods.Any(m => m is ModHidden) && !mods.Any(m => m is ModFlashlight))
             {
                 // Hidden gives almost nothing on max approach rate, and more the lower it is
                 if (minApproachRate >= 11.0)
@@ -158,7 +173,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 hiddenFactor = 1.0 + (hiddenFactor - 1.0) * Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
             }
 
-            double combinedMultiplier = approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
+            double hdflFactor = 1.0;
+            if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
+                hdflFactor = 1.15;
+
+            double combinedMultiplier = approachRateFactor * hiddenFactor * hdflFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
             if (clockRate >= 1.0)
                 combinedMultiplier *= 1.0 - 2.0 * tuning.DoubleTimeNerf * (clockRate - 1.0);
             else if (clockRate > 0.0)
