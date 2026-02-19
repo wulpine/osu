@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Longer maps are worth more. "Longer" means how many hits there are approximately
             // We add some undetected actions approximated with 20% of the maximum combo
-            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.2 * catchAttributes.MaxCombo;
+            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.25 * catchAttributes.MaxCombo;
 
             double linear_pace = tuning.PerformanceLengthLinearPace;
             double cutoff = tuning.PerformanceLengthCutoff;

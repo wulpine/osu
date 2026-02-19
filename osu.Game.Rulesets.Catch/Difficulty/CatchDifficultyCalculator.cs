@@ -257,8 +257,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double x1 = 2.3;
             const double y1 = 3.3;
 
-            const double x2 = 4.2;
-            const double y2 = 4.5;
+            const double x2 = 4.5;
+            const double y2 = 5.15;
 
             const double x3 = 6.5;
             const double y3 = 6.9;
@@ -270,10 +270,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double y5 = 9.4;
 
             const double x6 = 9.0;
-            const double y6 = 10.2;
+            const double y6 = 10.15;
 
-            const double x7 = 9.5;
-            const double y7 = 11.0;
+            const double x7 = 10.0;
+            const double y7 = 10.6;
 
 
             if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
