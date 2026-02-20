@@ -111,9 +111,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // adjustedApproachRate takes mods into account (DT, HT, FL), more on that in PerformanceCalculator
             double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, approachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate));
 
+            // High AR bonus
             const double first_threshold = 9.2;
             const double second_threshold = 10.15; //adjusted AR for AR9+DT
-            const double third_threshold = 11.0;
 
             const double first_power = 1.9;
             const double second_power = 1.15;
@@ -121,13 +121,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double second_constant = tuning.ApproachRateSecondConstant;
 
             double approachRateFactor = 1.0;
-
-            // High AR bonus
             if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
                 approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
             if (adjustedApproachRate >= second_threshold)
                 approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
-            if (adjustedApproachRate > third_threshold)
+            if (adjustedApproachRate > 11.0)
                 approachRateFactor = 1.0 + first_constant + second_constant; // max bonus at AR11 (for extended Lazer's scale/for FL to avoid breaking further calculations)
             approachRateFactor = Math.Sqrt(approachRateFactor);
 
@@ -178,18 +176,18 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 double flashlightApproachRateFactor = 1.0;
                 const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
-                const double first_fl_constant = 0.1;
+                const double first_fl_constant = 0.07;
                 const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
-                const double second_fl_constant = 0.14;
-                
+                const double second_fl_constant = 0.1;
+
                 if (adjustedApproachRate >= first_fl_threshold)
-                    flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_threshold);
+                    flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
                 if (adjustedApproachRate >= second_fl_threshold)
                     flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - second_fl_threshold);
 
                 // The following lines make sure that FL doesn't give less pp than NM
                 double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0) * lowARFullBonusSRRatio;
-                approachRateFactor = Math.Max(Math.Max(flashlightApproachRateFactor, maxLowARFactor), approachRateFactor);
+                approachRateFactor = Math.Max(flashlightApproachRateFactor, maxLowARFactor);
             }
 
 
@@ -197,9 +195,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 // When AR is high, the main struggle is FL, so we take approachRateFactor, which is the max of original approachRateFactor and flashlightApproachRateFactor.
                 // On top of that, we are adding an additional bonus common for all HDFL scores. It's included in SR.
                 // Length-based bonus for HDFL can be found in PerformanceCalculator.
-            const double hdfl_bonus = 0.15;
             if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
             {
+                const double hdfl_bonus = 0.08;
+                
                 approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + hdfl_bonus);
                 hiddenFactor = 1.0; // We have moved both bonuses into approachRateFactor so we set hiddenFactor to 1 to avoid double-counting
             }
