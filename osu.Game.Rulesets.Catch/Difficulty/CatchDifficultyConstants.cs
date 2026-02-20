@@ -18,10 +18,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SrScalerY6 { get; init; } = 11.0;
         public double SrOffset { get; init; } = 0.0; // Not used
 
-        public double ApproachRateSecondConstant { get; init; } = 0.41;
+        public double ApproachRateSecondConstant { get; init; } = 0.4;
 
-        public double BeginningTimePenaltyPower { get; init; } = 0.4;
-        public double BeginningFullPenalty { get; init; } = 0.56;
+        public double BeginningTimePenaltyPower { get; init; } = 0.5;
+        public double BeginningFullPenalty { get; init; } = 0.53;
 
         public double DefaultDecayWeight { get; init; } = 0.902;
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
