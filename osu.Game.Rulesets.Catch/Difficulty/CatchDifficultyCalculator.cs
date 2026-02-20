@@ -169,7 +169,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double lowARFullBonusSRRatio = Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
             if (minApproachRate <= min_ar_threshold)
                 approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
-            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;      
+            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;
+            
             double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0); // Max at AR0   
 
 
@@ -274,15 +275,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Parameters has been chosen with pp values in mind; to make SR->pp scaling similar to old one, we are scaling it once more.
             // This part doesn't affect pp values: in fact, only SR with nerf beginning is taken into account there.
             // The purpose of the SR below is only to show players how difficult patterns in the map are, which shouldn't depend on the map's length.
-            const double multiplier_to_show = 0.9;
+            const double multiplier_to_show = 0.95;
 
             double sr = calculateSr(notes, sorted, missCount);
             if (sr == 0.0)
                 return 0.0;
-            
-            double multiplier = sr < 5.0 ? 1.0 - (1.0 - multiplier_to_show) * Math.Pow(sr / 5.0, 2.0) : multiplier_to_show;
 
-            return sr * multiplier;
+            return sr * multiplier_to_show;
         }
 
         private double calculateSr(List<(double, double)> notes, List<(double, double)> sorted, int missCount = 0)
@@ -302,40 +301,48 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private double srScaler(double sr)
         {
-            const double x0 = 0.3;
-            const double y0 = 2.3;
+            const double x0 = 0.5;
+            const double y0 = 1.2;
 
-            const double x1 = 2.3;
-            const double y1 = 3.3;
+            const double x1 = 2.5;
+            const double y1 = 2.2;
+
+            const double x15 = 3.5;
+            const double y15 = 3.3;
 
             const double x2 = 4.5;
-            const double y2 = 5.15;
+            const double y2 = 4.7;
 
-            const double x3 = 6.5;
-            const double y3 = 6.9;
+            const double x3 = 5.5;
+            const double y3 = 5.8;
 
-            const double x4 = 7.5;
-            const double y4 = 8.7;
+            const double x4 = 6.5;
+            const double y4 = 6.9;
 
-            const double x5 = 8.5;
-            const double y5 = 9.4;
+            const double x5 = 7.5;
+            const double y5 = 8.7;
 
-            const double x6 = 9.0;
-            const double y6 = 10.15;
+            const double x6 = 8.5;
+            const double y6 = 9.4;
 
-            const double x7 = 10.0;
-            const double y7 = 10.6;
+            const double x7 = 9.0;
+            const double y7 = 10.15;
+
+            const double x8 = 10.0;
+            const double y8 = 10.6;
 
 
             if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
             if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
-            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
+            if (sr <= x15) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x15, y15);
+            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x15, y15, x2, y2);
             if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
             if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
             if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
             if (sr <= x6) return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
+            if (sr <= x7) return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
 
-            return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
+            return CatchPreprocessingUtils.Lerp(sr, x7, y7, x8, y8);
         }
 
         /// <summary>
