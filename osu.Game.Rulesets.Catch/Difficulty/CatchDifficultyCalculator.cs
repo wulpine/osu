@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             var difficulty = beatmap.BeatmapInfo.Difficulty.Clone();
             mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            double approachRate = difficulty.ApproachRate;
+            //double approachRate = difficulty.ApproachRate;
 
             double sr = calculateSr(startTimes, combinedStrains);
             double srBeginningNerfed = calculateSr(notes, sorted);
@@ -109,7 +109,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // AR calculations
             // AR bonus and HD bonus contribute to the SR; squared bonuses contribute to the pp value
             // adjustedApproachRate takes mods into account (DT, HT, FL), more on that in PerformanceCalculator
-            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, approachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate));
+            double originalApproachRate = difficulty.ApproachRate;
+            double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate);
+            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate));
 
             // High AR bonus
             const double first_threshold = 9.2;
@@ -124,7 +126,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
                 approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
             if (adjustedApproachRate >= second_threshold)
-                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
+                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (11.0 - second_threshold), second_power) * second_constant;
             if (adjustedApproachRate > 11.0)
                 approachRateFactor = 1.0 + first_constant + second_constant; // max bonus at AR11 (for extended Lazer's scale/for FL to avoid breaking further calculations)
             approachRateFactor = Math.Sqrt(approachRateFactor);
@@ -132,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // Low AR bonus: while for DT (clockRate > 1) we want to measure reaction time,
                 // for HT (clockRate < 1) we measure difference between moments of note disappearing and being caught.
-                    // That's why we take the original AR (instead of adjusted one that is higher) for calculating low AR bonus.
+                    // That's why we take the original AR (instead of adjusted one that is higher) for calculating the low AR bonus.
                 // Moreover, we are no longer adding any bonus below AR0.
             double minApproachRate = Math.Max(Math.Min(approachRate, adjustedApproachRate), 0.0);
             const double low_ar_bonus = 0.015;
