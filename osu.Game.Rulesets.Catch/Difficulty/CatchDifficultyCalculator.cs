@@ -110,8 +110,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // AR bonus and HD bonus contribute to the SR; squared bonuses contribute to the pp value
             // adjustedApproachRate takes mods into account (DT, HT, FL), more on that in PerformanceCalculator
             double originalApproachRate = difficulty.ApproachRate;
-            double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate);
-            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate));
+            double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate, false); // original AR including clockrate
+            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate), true); //AR artificially modified by changed clockrate or FL
 
             // High AR bonus
             const double first_threshold = 9.2;

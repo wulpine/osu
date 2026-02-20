@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
-            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate));
+            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate), true);
 
             // Length bonus: the longer the map is, the hardest it is to set a good score (FC/low misscount).
                 // This bonus is excluded from the SR on purpose: star rating should be an information about "how hard patterns are", while pp: "how hard getting full combo is".
@@ -122,14 +122,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // After that, we are recalculating AR and using it in AR calculation in DifficultyCalculator.
         // For DT and HT (or any other rates), we are taking into account that the faster catcher's velocity is, the more player can delay their moves.
             // That means, the faster the catcher is, the easier reacting to the falling notes is. We are approximating it in CorrectedClockRate function.
-        public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate)
+        public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate, bool withFlashLight = true)
         {
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450) / correctedClockRate;
 
-            const double flashlight_visibility_time = 203.125 * 0.77 / 440.0; // 203.125 pixels above catcher are visible at 200 combo; 440 pixels is the height of the visible playfield
-
-            if (mods.Any(m => m is ModFlashlight))
+            if (mods.Any(m => m is ModFlashlight) && withFlashLight)
+            {
+                const double flashlight_visibility_time = 203.125 * 0.77 / 440.0; // 203.125 pixels above catcher are visible at 200 combo; 440 pixels is the height of the visible playfield
                 preempt *= flashlight_visibility_time;
+            }
 
             return preempt > 1200.0 ? (1800.0 - preempt) / 120.0 : (1200.0 - preempt) / 150.0 + 5.0;
         }
