@@ -41,6 +41,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double value = calculateValue(catchAttributes.SRBeginningNerfed);
 
+
+            // Miss penalty: as our system is highly sensitive towards "difficulty spikes" (which allows us to reward more variety of skillsets),
+                // it is important to make sure that scores with high misscount don't give too much pp.
+                // Otherwise, it could create some absurd possibilities, for example player could intentionally miss on all hard edge jumps in the map and still get pp for it.
+                // Moreover, we keep penalty for the first miss at 95% level (lower than "expected") to separate FC and non-FC.
+                // At the same time, combo scaling is slightly reduced compared to the previous pp system.
             const double base_penalty = 0.965;
 
             double penalty = numMiss switch
@@ -54,9 +60,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             value *= penalty;
 
-            // Combo scaling power is adjusted from 0.35 to 0.32 to compensate for the harsher misscount penalties
+            // Combo scaling power is adjusted from 0.35 to 0.32 to compensate for the harsher misscount penalties.
             const double scaling_power = 0.32;
-
             if (catchAttributes.MaxCombo > 0)
                 value *= Math.Min(Math.Pow(score.MaxCombo, scaling_power) / Math.Pow(catchAttributes.MaxCombo, scaling_power), 1.0);
 
@@ -68,15 +73,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate));
 
-            // Longer maps are worth more. "Longer" means how many hits there are approximately
-            // We add some undetected actions approximated with 20% of the maximum combo
+            // Length bonus: the longer the map is, the hardest it is to set a good score (FC/low misscount).
+                // This bonus is excluded from the SR on purpose: star rating should be an information about "how hard patterns are", while pp: "how hard getting full combo is".
+            // The base length measure is the number of actions: our calculations performed in preprocessing let us approximate how many times player has to change combination of keys they are holding.
+                // Some undetected actions aren't detected due to limitations of the algorithm. We approximate their number with 25% of the maximum combo.
+            const double combo_percentage = 0.25;
             double maxCombo = catchAttributes.MaxCombo;
-            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + 0.25 * maxCombo;
+            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + combo_percentage * maxCombo;
 
             double linear_pace = tuning.PerformanceLengthLinearPace;
             double cutoff = tuning.PerformanceLengthCutoff;
             double logarithmic_pace = tuning.PerformanceLengthLogarithmicPace;
 
+            // Pace is linear at first, then it's logarithmic (growth is slower).
             double lengthBonus =
                 1.0 + linear_pace * Math.Min(1.0, totalActions / cutoff) +
                 (totalActions > cutoff ? Math.Log10(totalActions / cutoff) * logarithmic_pace : 0.0);
@@ -84,18 +93,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Length bonus should depend on approachRate (including FlashLight): if it's high enough, it's either draining or it requires memorisation
             lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
 
+            // Additional length bonus for FL and HDFL
             if (score.Mods.Any(m => m is ModFlashlight))
             {
                 if (score.Mods.Any(m => m is ModHidden))
-                    lengthBonus = Math.Pow(lengthBonus, 2.8);
+                    lengthBonus = Math.Pow(lengthBonus, 2.5);
                 else
                     lengthBonus = Math.Pow(lengthBonus, 2.0);
             }
-
-            const double unaffected_percentage_pp_fl = 0.2;
-            const double full_fl_bonus = 225;
-            if (maxCombo <= 225 && score.Mods.Any(m => m is ModFlashlight))
-                value = unaffected_percentage_pp_fl * value + (1-unaffected_percentage_pp_fl) * value * maxCombo / 225.0;
 
             value *= Math.Pow(accuracy(), 5.5);
 
@@ -112,6 +117,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             };
         }
 
+        // The following function returns "adjusted approach rate"
+        // For FL, we are calculating the time ("preempt") that takes note to fall between an appearance of the note on the screen (in the highest visible spot) and falling onto the catcher.
+            // After that, we are recalculating AR and using it in AR calculation in DifficultyCalculator.
+        // For DT and HT (or any other rates), we are taking into account that the faster catcher's velocity is, the more player can delay their moves.
+            // That means, the faster the catcher is, the easier reacting to the falling notes is. We are approximating it in CorrectedClockRate function.
         public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate)
         {
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450) / correctedClockRate;
@@ -124,7 +134,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return preempt > 1200.0 ? (1800.0 - preempt) / 120.0 : (1200.0 - preempt) / 150.0 + 5.0;
         }
 
-        public static double CorrectedClockRate(double clockRate) => 1.0 + (clockRate - 1.0) * 0.8; // AR9+DT is approximately AR10.15 after correction
+        public static double CorrectedClockRate(double clockRate) => 1.0 + (clockRate - 1.0) * 0.8; // AR9+DT approximately equals AR10.15 after correction
 
         private double calculateValue(double sr) => Math.Pow(5.0 * Math.Max(1.0, sr / 0.0049) - 4.0, 2.0) / 100000.0;
 

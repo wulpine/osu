@@ -105,6 +105,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // double precision = calculateSr(startTimes, combineStrains(actionProbabilities, precisionStrains, zeroes, readingFactors, highCSFactors));
             // double speed = calculateSr(startTimes, combineStrains(actionProbabilities, speedStrains, zeroes, readingFactors, highCSFactors));
 
+
+            // AR calculations
+            // AR bonus and HD bonus contribute to the SR; squared bonuses contribute to the pp value
+            // adjustedApproachRate takes mods into account (DT, HT, FL), more on that in PerformanceCalculator
             double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, approachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate));
 
             const double first_threshold = 9.2;
@@ -115,69 +119,93 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             const double second_power = 1.15;
             const double first_constant = 0.1;
             double second_constant = tuning.ApproachRateSecondConstant;
-            const double third_constant = 0.1; // Additional bonus for FL (starting at around AR8) or Lazer's extended AR scale
 
             double approachRateFactor = 1.0;
 
-            if (!mods.Any(m => m is ModFlashlight))
-            {
-                if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
-                    approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
-                if (adjustedApproachRate >= second_threshold)
-                    approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
-                if (adjustedApproachRate > third_threshold)
-                    approachRateFactor += third_constant * (adjustedApproachRate - 11.0);
-                approachRateFactor = Math.Sqrt(approachRateFactor);
-            }
-            else
-            {
-                const double first_fl_threshold = 8.5;
-                const double first_fl_constant = 0.1;
-                const double second_fl_threshold = 9.5;
-                const double second_fl_constant = 10.5;
-                if (adjustedApproachRate >= second_fl_constant)
-                    approachRateFactor = 1.2 + 0.14 * (Math.Min(12.0, adjustedApproachRate) - 10.5);
-                else if (adjustedApproachRate >= first_threshold)
-                    approachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_threshold);
-            }
+            // High AR bonus
+            if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
+                approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
+            if (adjustedApproachRate >= second_threshold)
+                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (third_threshold - second_threshold), second_power) * second_constant;
+            if (adjustedApproachRate > third_threshold)
+                approachRateFactor = 1.0 + first_constant + second_constant; // max bonus at AR11 (for extended Lazer's scale/for FL to avoid breaking further calculations)
+            approachRateFactor = Math.Sqrt(approachRateFactor);
 
 
-            // While for DT (clockRate > 1) we want to measure reaction time, for HT (clockRate < 1) we measure difference between moments of note disappearing and being caught
-            // That's why we take original AR (instead of adjusted one that is higher) for calculating low AR bonus
-            double minApproachRate = Math.Min(approachRate, adjustedApproachRate);
+            // Low AR bonus: while for DT (clockRate > 1) we want to measure reaction time,
+                // for HT (clockRate < 1) we measure difference between moments of note disappearing and being caught.
+                    // That's why we take the original AR (instead of adjusted one that is higher) for calculating low AR bonus.
+                // Moreover, we are no longer adding any bonus below AR0.
+            double minApproachRate = Math.Max(Math.Min(approachRate, adjustedApproachRate), 0.0);
             const double low_ar_bonus = 0.015;
             const double min_ar_threshold = 7.0; // Threshold is chosen so that low AR doesn't affect range common for EZDT mod combination
-            const double low_ar_full_bonus_sr = 5.0; // Easier maps have lower AR by default; low AR doesn't change difficulty much
+            const double low_ar_full_bonus_sr = 5.0; // Easier maps have lower AR by default; low AR doesn't change their difficulty much
 
-            if (minApproachRate <= min_ar_threshold && !mods.Any(m => m is ModHidden) && !mods.Any(m => m is ModFlashlight)) // visual mods are affected by their respective bonuses
-                approachRateFactor = Math.Sqrt(1.0 + low_ar_bonus * (min_ar_threshold - minApproachRate));
-            approachRateFactor *= Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
+            if (minApproachRate <= min_ar_threshold && !mods.Any(m => m is ModHidden)) // hidden is affected by a separate bonus
+                approachRateFactor = Math.Sqrt(1.0 + low_ar_bonus * (min_ar_threshold - minApproachRate)); // 3% at AR5, 10.5% at AR0
 
+
+            // HD bonus: hidden gives almost nothing on max approach rate, and more the lower it is.
+                // HD bonus for low AR (below min_ar_threshold) is always greater than low AR bonus for NM. Note that HD has been excluded from low AR bonus.
             double hiddenFactor = 1.0;
             const double min_hidden_bonus = 0.01;
             const double threshold_linear = 8.0; // AR threshold between linear decrease and smooth (and less steep) curve
             const double hidden_growth = 0.235; // Value determining AR bonus at threshold_linear (and pace of growth of the function for higher AR values)
             const double hidden_power = 1.65;
 
-            if (mods.Any(m => m is ModHidden) && !mods.Any(m => m is ModFlashlight))
+            if (mods.Any(m => m is ModHidden))
             {
-                // Hidden gives almost nothing on max approach rate, and more the lower it is
                 if (minApproachRate >= 11.0)
                     hiddenFactor = 1.0 + min_hidden_bonus;
-                if (minApproachRate >= threshold_linear && adjustedApproachRate < 11.0)
-                    hiddenFactor = 1.0 + min_hidden_bonus + hidden_growth * Math.Pow(((11.0 - adjustedApproachRate) / (11.0 - threshold_linear)), hidden_power);
+                if (minApproachRate >= threshold_linear && minApproachRate < 11.0)
+                    hiddenFactor = 1.0 + min_hidden_bonus + hidden_growth * Math.Pow(((11.0 - minApproachRate) / (11.0 - threshold_linear)), hidden_power);
                 if (minApproachRate < threshold_linear)
-                    hiddenFactor = 1.0 + min_hidden_bonus + hidden_growth * (1.0 - hidden_power * (adjustedApproachRate - threshold_linear) / (11.0 - threshold_linear)); //tangent line to the function above at point threshold_linear
+                    hiddenFactor = 1.0 + min_hidden_bonus + hidden_growth * (1.0 - hidden_power * (minApproachRate - threshold_linear) / (11.0 - threshold_linear)); //tangent line to the function above at point threshold_linear
 
                 hiddenFactor = Math.Sqrt(hiddenFactor); // SR-pp scaling
-                hiddenFactor = 1.0 + (hiddenFactor - 1.0) * Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
             }
 
-            double hdflFactor = 1.0;
-            if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
-                hdflFactor = 1.15;
 
-            double combinedMultiplier = approachRateFactor * hiddenFactor * hdflFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
+            double lowARFullBonusSRRatio = Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
+            approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
+            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;            
+
+
+            // FL (AR) bonus: the higher AR is, the harder flashlight is.
+                // Here we are working with adjustedApproachRate calculated in PerformanceCalculator.cs which states the relation between "original AR" and "flashlight AR".
+                // Length-based bonuses for FL can be found in PerformanceCalculator.
+            if (mods.Any(m => m is ModFlashlight))
+            {
+                double flashlightApproachRateFactor = 1.0;
+                const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
+                const double first_fl_constant = 0.1;
+                const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
+                const double second_fl_constant = 0.14;
+                
+                if (adjustedApproachRate >= first_fl_threshold)
+                    flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_threshold);
+                if (adjustedApproachRate >= second_fl_threshold)
+                    flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - second_fl_threshold);
+
+                // The following lines make sure that FL doesn't give less pp than NM
+                double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0) * lowARFullBonusSRRatio;
+                approachRateFactor = Math.Max(Math.Max(flashlightApproachRateFactor, maxLowARFactor), approachRateFactor);
+            }
+
+
+            // HDFL bonus: when AR is low, the main struggle is HD, so we take hiddenFactor (note that it's calculated using original approachRate!).
+                // When AR is high, the main struggle is FL, so we take approachRateFactor, which is the max of original approachRateFactor and flashlightApproachRateFactor.
+                // On top of that, we are adding an additional bonus common for all HDFL scores. It's included in SR.
+                // Length-based bonus for HDFL can be found in PerformanceCalculator.
+            const double hdfl_bonus = 0.15;
+            if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
+            {
+                approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + hdfl_bonus);
+                hiddenFactor = 1.0; // We have moved both bonuses into approachRateFactor so we set hiddenFactor to 1 to avoid double-counting
+            }
+
+
+            double combinedMultiplier = approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
             if (clockRate >= 1.0)
                 combinedMultiplier *= 1.0 - 2.0 * tuning.DoubleTimeNerf * (clockRate - 1.0);
             else if (clockRate > 0.0)
