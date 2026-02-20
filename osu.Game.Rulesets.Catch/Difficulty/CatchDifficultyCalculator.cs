@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double minApproachRate = Math.Max(Math.Min(approachRate, adjustedApproachRate), 0.0);
             const double low_ar_bonus = 0.015;
             const double min_ar_threshold = 7.0; // Threshold is chosen so that low AR doesn't affect range common for EZDT mod combination
-            const double low_ar_full_bonus_sr = 5.0; // Easier maps have lower AR by default; low AR doesn't change their difficulty much
+            const double low_ar_full_bonus_sr = 4.0; // Easier maps have lower AR by default; low AR doesn't change their difficulty much
 
             if (minApproachRate <= min_ar_threshold && !mods.Any(m => m is ModHidden)) // hidden is affected by a separate bonus
                 approachRateFactor = Math.Sqrt(1.0 + low_ar_bonus * (min_ar_threshold - minApproachRate)); // 3% at AR5, 10.5% at AR0
@@ -167,8 +167,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
 
             double lowARFullBonusSRRatio = Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
-            approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
-            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;            
+            if (minApproachRate <= min_ar_threshold)
+                approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
+            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;      
+            double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0); // Max at AR0   
 
 
             // FL (AR) bonus: the higher AR is, the harder flashlight is.
@@ -189,8 +191,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - second_fl_threshold);
                 flashlightApproachRateFactor *= 1.0 + base_fl_bonus;
 
-                // The following lines make sure that FL doesn't give less pp than NM
-                double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0) * lowARFullBonusSRRatio;
+                // The following line makes sure that FL doesn't give less pp than NM
                 approachRateFactor = Math.Max(flashlightApproachRateFactor, maxLowARFactor);
             }
 
