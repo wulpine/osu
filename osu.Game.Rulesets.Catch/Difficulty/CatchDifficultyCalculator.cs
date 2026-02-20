@@ -177,9 +177,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModFlashlight))
             {
                 double flashlightApproachRateFactor = 1.0;
-                const double fl_bonus = 0.03;
+                const double base_fl_bonus = 0.05;
                 const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
-                const double first_fl_constant = 0.07;
+                const double first_fl_constant = 0.06;
                 const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
                 const double second_fl_constant = 0.09;
 
@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
                 if (adjustedApproachRate >= second_fl_threshold)
                     flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - second_fl_threshold);
-                adjustedApproachRate *= fl_bonus;
+                flashlightApproachRateFactor *= 1.0 + base_fl_bonus;
 
                 // The following lines make sure that FL doesn't give less pp than NM
                 double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0) * lowARFullBonusSRRatio;
