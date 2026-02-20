@@ -180,11 +180,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModFlashlight))
             {
                 double flashlightApproachRateFactor = 1.0;
-                const double base_fl_bonus = 0.05;
+                const double base_fl_bonus = 0.07;
                 const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
                 const double first_fl_constant = 0.06;
                 const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
-                const double second_fl_constant = 0.09;
+                const double second_fl_constant = 0.11;
 
                 if (adjustedApproachRate >= first_fl_threshold)
                     flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 // Length-based bonus for HDFL can be found in PerformanceCalculator.
             if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
             {
-                const double hdfl_bonus = 0.07;
+                const double hdfl_bonus = 0.08;
                 
                 approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + hdfl_bonus);
                 hiddenFactor = 1.0; // We have moved both bonuses into approachRateFactor so we set hiddenFactor to 1 to avoid double-counting
