@@ -194,21 +194,21 @@ namespace osu.Game.Rulesets.Difficulty
         {
             playableMods = mods.Select(m => m.DeepClone()).ToArray();
 
-            string[] modReps = mods.Select(m => m.Name).Order().ToArray();
-            string modRep = string.Join("", modReps);
+            // string[] modReps = mods.Select(m => m.Name).Order().ToArray();
+            // string modRep = string.Join("", modReps);
 
             // Console.WriteLine($"{WorkingBeatmap.BeatmapInfo.OnlineID}, {ruleset.Name}, {modRep}");
 
-            if (BEATMAP_CACHE.TryGetValue((WorkingBeatmap.BeatmapInfo.OnlineID, ruleset.Name, modRep), out var value))
-            {
-                Beatmap = value;
-                // Console.WriteLine($"{Beatmap.BeatmapInfo.DifficultyName}: {modRep}");
-            }
-            else
-            {
-                Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
-                BEATMAP_CACHE.Add((WorkingBeatmap.BeatmapInfo.OnlineID, ruleset.Name, modRep), Beatmap.Clone());
-            }
+            // if (BEATMAP_CACHE.TryGetValue((WorkingBeatmap.BeatmapInfo.OnlineID, ruleset.Name, modRep), out var value))
+            // {
+            //     Beatmap = value;
+            //     // Console.WriteLine($"{Beatmap.BeatmapInfo.DifficultyName}: {modRep}");
+            // }
+            // else
+            // {
+            Beatmap = WorkingBeatmap.GetPlayableBeatmap(ruleset, playableMods, cancellationToken);
+            // BEATMAP_CACHE.Add((WorkingBeatmap.BeatmapInfo.OnlineID, ruleset.Name, modRep), Beatmap.Clone());
+            // }
 
             clockRate = ModUtils.CalculateRateWithMods(playableMods);
         }
