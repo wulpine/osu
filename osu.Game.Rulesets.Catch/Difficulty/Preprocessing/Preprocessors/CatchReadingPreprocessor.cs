@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
         private const double max_velocity_nerf_threshold = 7.0;
         private const double high_velocity_power = 0.75;
 
-        private const double high_distance_threshold = 256.0;
+        private const double high_distance_threshold = 200.0;
         private const double high_distance_power = 1.4;
 
         private const double density_buff = 1.0;

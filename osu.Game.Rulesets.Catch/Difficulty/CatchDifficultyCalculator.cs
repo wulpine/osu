@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
                 const double first_fl_constant = 0.06;
                 const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
-                const double second_fl_constant = 0.11;
+                const double second_fl_constant = 0.12;
 
                 if (adjustedApproachRate >= first_fl_threshold)
                     flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // Parameters has been chosen with pp values in mind; to make SR->pp scaling similar to old one, we are scaling it once more.
             // This part doesn't affect pp values: in fact, only SR with nerf beginning is taken into account there.
             // The purpose of the SR below is only to show players how difficult patterns in the map are, which shouldn't depend on the map's length.
-            const double multiplier_to_show = 0.95;
+            const double multiplier_to_show = 0.94;
 
             double sr = calculateSr(notes, sorted, missCount);
             if (sr == 0.0)
