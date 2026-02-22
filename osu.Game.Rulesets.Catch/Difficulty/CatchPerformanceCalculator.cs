@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 1 => 0.95,
                 2 => 0.93,
                 3 => 0.90,
-                var x => Math.Pow(base_penalty, 4) * Math.Pow(base_penalty - 0.001 * (x - 4), (x - 4))
+                var x => Math.Pow(base_penalty, 4) * Math.Pow(Math.Max(0, base_penalty - 0.001 * (x - 4)), (x - 4))
             };
 
             value *= penalty;
