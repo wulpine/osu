@@ -341,8 +341,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
                 CatchDifficultyHitObject prev = actionNotes[i - 1];
                 CatchDifficultyHitObject note = actionNotes[i];
                 CatchDifficultyHitObject next = actionNotes[i + 1];
-                double currentDistance = (note.Position - prev.Position) * clockRate;
-                double nextDistance = (next.Position - note.Position) * clockRate;
+                double currentDistance = Math.Abs(note.Position - prev.Position) * clockRate;
+                double nextDistance = Math.Abs(next.Position - note.Position) * clockRate;
                 double averageDistance = (currentDistance + nextDistance) / 2.0;
 
                 if (averageDistance > high_distance_threshold)
