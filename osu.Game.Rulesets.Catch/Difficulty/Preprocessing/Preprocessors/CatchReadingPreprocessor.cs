@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
         private const double high_velocity_power = 0.75;
 
         private const double high_distance_threshold = 256.0;
-        private const double high_distance_power = 1.4;
 
         private const double density_buff = 1.0;
         private const double max_precision_ratio = 0.5;
@@ -347,7 +346,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
                 if (averageDistance > high_distance_threshold)
                 {
-                    note.ReadingData.CombinedReadingFactor *= 1.0 + tuning.ReadingHighDistanceBuff * Math.Pow((averageDistance - high_distance_threshold) / (512.0 - high_distance_threshold), high_distance_power);
+                    note.ReadingData.CombinedReadingFactor *= 1.0 + tuning.ReadingHighDistanceBuff * Math.Pow((averageDistance - high_distance_threshold) / (512.0 - high_distance_threshold), tuning.ReadingHighDistancePower);
                 }
             }
         }
