@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
         public double SrPreMultiplier { get; init; } = 1.0;
-        public double SrPostMultiplier { get; init; } = 0.9;
+        public double SrPostMultiplier { get; init; } = 0.88;
         public double SrScalerY0 { get; init; } = 1.7; // SrScaled are different in DifficultyPreprocessor.cs; the one written here aren't applied
         public double SrScalerY1 { get; init; } = 4.55;
         public double SrScalerY2 { get; init; } = 6.9;
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SrScalerY6 { get; init; } = 11.0;
         public double SrOffset { get; init; } = 0.0; // Not used
 
-        public double ApproachRateSecondConstant { get; init; } = 0.4;
+        public double ApproachRateSecondConstant { get; init; } = 0.37;
 
         public double BeginningTimePenaltyPower { get; init; } = 0.5;
         public double BeginningFullPenalty { get; init; } = 0.53;
@@ -27,15 +27,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
 
         public double LowSpeedThresholdLSR { get; init; } = 10.0;
-        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.7;
+        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.65;
 
         public double LocalStarRatingMaxConstant { get; init; } = 1.06;
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.18;
 
-        public double PerformanceLengthLinearPace { get; init; } = 0.24;
+        public double PerformanceLengthLinearPace { get; init; } = 0.25;
         public double PerformanceLengthCutoff { get; init; } = 1700;
-        public double PerformanceLengthLogarithmicPace { get; init; } = 0.24;
+        public double PerformanceLengthLogarithmicPace { get; init; } = 0.26;
 
         public double PerformanceValueMultiplier { get; init; } = 1.05;
 
@@ -50,16 +50,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionStrainPace { get; init; } = 35.0;
         public double PrecisionStrainMultiplier { get; init; } = 52.0;
 
-        public double HighPrecisionThreshold { get; init; }  = 30.0;
-        public double HighPrecisionPace { get; init; } = 2.7;
-        public double HighPrecisionPower { get; init; } = 1.35;
+        public double HighPrecisionThreshold { get; init; }  = 32.0;
+        public double HighPrecisionPace { get; init; } = 3.0;
+        public double HighPrecisionPower { get; init; } = 1.3;
 
         public double MaxPrecisionCorrection { get; init; } = 1.3;
 
         public double SpeedSnapAmplitude { get; init; } = 19.1;
         public double SpeedSnapShift { get; init; } = -10.0;
         public double SpeedSnapPace { get; init; } = 50.0;
-        public double SpeedSnapMultiplier { get; init; } = 0.91;
+        public double SpeedSnapMultiplier { get; init; } = 0.92;
 
         public double SpeedBurstAmplitude { get; init; } = 19.1;
         public double SpeedBurstShift { get; init; } = -10.0;
@@ -71,9 +71,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SpeedConsistencyPace { get; init; } = 52.0;
         public double SpeedConsistencyMultiplier { get; init; } = 1.07;
 
-        public double ReadingHighCsPower { get; init; } = 1.8;
+        public double ReadingHighCsPower { get; init; } = 1.9;
         public double ReadingHighCsRate { get; init; } = 0.41;
-        public double ReadingHighCsPenaltyHypers { get; init; } = 0.75;
+        public double ReadingHighCsPenaltyHypers { get; init; } = 0.8;
 
         public double ReadingLocalRhythmPenalty { get; init; } = 0.95;
         public double ReadingExplicitRhythmPenalty { get; init; } = 0.94;
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double ReadingHyperchainPenalty { get; init; } = 0.95;
         public double ReadingNonHyperchainPenalty { get; init; } = 0.96;
         public double ReadingHighVelocityNerf { get; init; } = 0.1;
-        public double ReadingHighDistanceBuff { get; init; } = 0.18;
+        public double ReadingHighDistanceBuff { get; init; } = 0.2;
         public double ReadingHighDistancePower { get; init; } = 1.4;
         public double ReadingFakeActionBuff { get; init; } = 1.07;
         public double ReadingFuturePrecisionBuff { get; init; } = 0.19;
@@ -94,9 +94,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionTimeExponent { get; init; } = 1.25;
         public double PrecisionCorrectionDistanceWeight { get; init; } = 0.3;
 
-        public double DoubleTimeNerf = 0.035;
+        public double DoubleTimeNerf = 0.03;
         public double HalfTimeBuff = 0.05;
 
-        public double FinalPPMultiplier { get; init; } = 1.46;
+        public double FinalPPMultiplier { get; init; } = 1.49;
     }
 }

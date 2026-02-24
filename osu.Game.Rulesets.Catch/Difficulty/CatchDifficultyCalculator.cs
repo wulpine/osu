@@ -180,7 +180,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModFlashlight))
             {
                 double flashlightApproachRateFactor = 1.0;
-                const double base_fl_bonus = 0.07;
+                const double base_fl_bonus = 0.06;
                 const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
                 const double first_fl_constant = 0.06;
                 const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
