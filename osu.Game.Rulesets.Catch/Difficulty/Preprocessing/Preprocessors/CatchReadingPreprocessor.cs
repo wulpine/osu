@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
         private const double high_distance_threshold = 256.0;
 
-        private const double density_buff = 1.0;
         private const double max_precision_ratio = 0.5;
         private const double max_delta_time = 300.0;
         private const double time_power = 0.5;
@@ -64,7 +63,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             nonHyperchainPenalty(actionNotes, tuning);
             highVelocityNerf(cdhos, frameTime, tuning);
             highDistanceBuff(actionNotes, clockRate, tuning);
-            // densityBuff(cdhos);
             fakeActionBuff(actionNotes, tuning);
             futurePrecisionBuff(cdhos, tuning);
         }
@@ -326,10 +324,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             {
                 CatchDifficultyHitObject note = cdhos[i];
                 CatchDifficultyHitObject prev = cdhos[i - 1];
-                double speed = CatchPreprocessingUtils.CalculatePerfectHyperdashSpeed(note, prev, frameTime);
+                double velocity = CatchPreprocessingUtils.CalculatePerfectHyperdashSpeed(note, prev, frameTime);
 
-                if (prev.IsHyper && speed > high_velocity_threshold)
-                    note.ReadingData.CombinedReadingFactor *= 1.0 - tuning.ReadingHighVelocityNerf * Math.Min(1.0, Math.Pow((speed - high_velocity_threshold) / (max_velocity_nerf_threshold - high_velocity_threshold), high_velocity_power));
+                if (prev.IsHyper && velocity > high_velocity_threshold)
+                    note.ReadingData.CombinedReadingFactor *= 1.0 - tuning.ReadingHighVelocityNerf * Math.Min(1.0, Math.Pow((velocity - high_velocity_threshold) / (max_velocity_nerf_threshold - high_velocity_threshold), high_velocity_power));
             }
         }
 
@@ -366,18 +364,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             }
         }
 
-        // Especially on rain/overdose level, it is harder to read direction changes when there's at least one note between them
-        private static void densityBuff(List<CatchDifficultyHitObject> cdhos)
-        {
-            for (int i = 1; i < cdhos.Count; i++)
-            {
-                CatchDifficultyHitObject note = cdhos[i];
-                CatchDifficultyHitObject prev = cdhos[i - 1];
-
-                if (prev.MovementData.ActionProbability == 0)
-                    note.ReadingData.CombinedReadingFactor *= density_buff;
-            }
-        }
 
         private static void fakeActionBuff(List<CatchDifficultyHitObject> cdhos, CatchDifficultyConstants tuning)
         {
