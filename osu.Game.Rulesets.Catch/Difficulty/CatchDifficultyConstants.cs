@@ -82,9 +82,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double ReadingAlternatingDistancePenalty { get; init; } = 0.97;
         public double ReadingHyperchainPenalty { get; init; } = 0.95;
         public double ReadingNonHyperchainPenalty { get; init; } = 0.96;
-        public double ReadingHighVelocityNerf { get; init; } = 0.1;
-        public double ReadingHighDistanceBuff { get; init; } = 0.2;
-        public double ReadingHighDistancePower { get; init; } = 1.4;
+        public double ReadingHighVelocityNerf { get; init; } = 0.0;
+        public double ReadingHighDistanceBuff { get; init; } = 0.14;
+        public double ReadingHighDistancePower { get; init; } = 1.3;
         public double ReadingFakeActionBuff { get; init; } = 1.07;
         public double ReadingFuturePrecisionBuff { get; init; } = 0.19;
 
