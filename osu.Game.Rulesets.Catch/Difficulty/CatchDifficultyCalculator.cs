@@ -214,7 +214,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (clockRate >= 1.0)
                 combinedMultiplier *= 1.0 - 2.0 * tuning.DoubleTimeNerf * (clockRate - 1.0);
             else if (clockRate > 0.0)
-                combinedMultiplier *= 1.0 + 2.0 * tuning.HalfTimeBuff * (1.0 / clockRate - 1.0);
+                combinedMultiplier *= 1.0 + 2.0 * tuning.DoubleTimeNerf * (1.0 / clockRate - 1.0);
 
             CatchDifficultyAttributes attributes = new CatchDifficultyAttributes
             {

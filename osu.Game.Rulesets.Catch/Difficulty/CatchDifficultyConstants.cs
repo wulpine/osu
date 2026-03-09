@@ -95,7 +95,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double PrecisionCorrectionDistanceWeight { get; init; } = 0.3;
 
         public double DoubleTimeNerf = 0.03;
-        public double HalfTimeBuff = 0.05;
 
         public double FinalPPMultiplier { get; init; } = 1.49;
     }
