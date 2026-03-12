@@ -151,6 +151,8 @@ namespace osu.Game.Rulesets.Difficulty
                     currentIndex++;
                 }
 
+                DifficultyHitObjects = difficultyObjects[..currentIndex];
+
                 attribs.Add(new TimedDifficultyAttributes(obj.GetEndTime(), CreateDifficultyAttributes(progressiveBeatmap, playableMods, skills, clockRate)));
             }
 
