@@ -249,11 +249,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
                 data.RawPrecisionStrain = calculatePrecisionStrain(note, tuning);
                 if (data.NotePattern == PatternType.Hyperjumps)
                     data.PrecisionStrain = (raw_weight_hyperjumps * data.RawPrecisionStrain + (1.0 - raw_weight_hyperjumps) * prevData.RawPrecisionStrain * prevData.ActionProbability) * data.ActionProbability;
-                else if (data.NotePattern == PatternType.HyperjumpAfterJump)
+                else if (data.NotePattern == PatternType.HyperjumpAfterJump || data.NotePattern == PatternType.PotentialStandstill)
                     data.PrecisionStrain = data.PrecisionStrain = (raw_weight_hyperjump_after_jump * data.RawPrecisionStrain + (1.0 - raw_weight_hyperjump_after_jump) * prevData.RawPrecisionStrain * prevData.ActionProbability) * data.ActionProbability;
                 else if (data.NotePattern == PatternType.JumpAfterHyperjump)
                     data.PrecisionStrain = data.PrecisionStrain = (raw_weight_jump_after_hyperjump * data.RawPrecisionStrain + (1.0 - raw_weight_jump_after_hyperjump) * prevData.RawPrecisionStrain * prevData.ActionProbability) * data.ActionProbability;
-                else if (data.NotePattern == PatternType.Jumps)
+                else if (data.NotePattern == PatternType.Jumps || data.NotePattern == PatternType.AcceleratingStream)
                     data.PrecisionStrain = data.PrecisionStrain = (raw_weight_jumps * data.RawPrecisionStrain + (1.0 - raw_weight_jumps) * prevData.RawPrecisionStrain * prevData.ActionProbability) * data.ActionProbability;
                 else
                     data.PrecisionStrain = data.RawPrecisionStrain * data.ActionProbability;

@@ -39,11 +39,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double PerformanceValueMultiplier { get; init; } = 1.05;
 
-        public double PrecisionRawWeightHyperjumps { get; init; } = 0.92;
+        public double PrecisionRawWeightHyperjumps { get; init; } = 0.94;
         public double PrecisionRawWeightHyperjumpAfterJump { get; init; } = 0.98;
         public double PrecisionRawWeightJumpAfterHyperjump { get; init; } = 0.98;
-        public double PrecisionRawWeightJumps { get; init; } = 0.98;
-        public double PrecisionDelayedWeight { get; init; } = 0.95;
+        public double PrecisionRawWeightJumps { get; init; } = 0.97;
+        public double PrecisionDelayedWeight { get; init; } = 0.94;
 
         public double PrecisionStrainAmplitude { get; init; } = 33.2;
         public double PrecisionStrainShift { get; init; } = -7.0;
