@@ -114,12 +114,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate), true); //AR artificially modified by changed clockrate or FL
 
             // High AR bonus
-            const double first_threshold = 9.2;
+            const double first_threshold = 9.0;
             const double second_threshold = 10.15; //adjusted AR for AR9+DT
 
-            const double first_power = 1.9;
+            const double first_power = 1.7;
             const double second_power = 1.15;
-            const double first_constant = 0.1;
+            const double first_constant = 0.12;
             double second_constant = tuning.ApproachRateSecondConstant;
 
             double approachRateFactor = 1.0;
@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double hiddenFactor = 1.0;
             const double min_hidden_bonus = 0.01;
             const double threshold_linear = 8.0; // AR threshold between linear decrease and smooth (and less steep) curve
-            const double hidden_growth = 0.235; // Value determining AR bonus at threshold_linear (and pace of growth of the function for higher AR values)
+            const double hidden_growth = 0.25; // Value determining AR bonus at threshold_linear (and pace of growth of the function for higher AR values)
             const double hidden_power = 1.65;
 
             if (mods.Any(m => m is ModHidden))

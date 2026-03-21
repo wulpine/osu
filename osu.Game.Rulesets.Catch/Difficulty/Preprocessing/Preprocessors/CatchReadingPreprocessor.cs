@@ -13,7 +13,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 {
     public static class CatchReadingPreprocessor
     {
-        private const double high_cs_threshold = 3.5;
+        private const double high_cs_threshold = 2.0;
+
         private const double local_rhythm_range = 20.0;
         private const double local_rhythm_sensitivity = 2.0;
 
@@ -63,7 +64,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             nonHyperchainPenalty(actionNotes, tuning);
             // highVelocityNerf(cdhos, frameTime, tuning);
             highDistanceBuff(actionNotes, clockRate, tuning);
-            fakeActionBuff(actionNotes, tuning);
             futurePrecisionBuff(cdhos, tuning);
         }
 
@@ -351,7 +351,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
         private static void highCSBuff(List<CatchDifficultyHitObject> actionNotes, double circleSize, CatchDifficultyConstants tuning)
         {
-            double circleSizeBonus = Math.Pow(Math.Max(0.0, circleSize - high_cs_threshold) / 10.0, tuning.ReadingHighCsPower) * tuning.ReadingHighCsRate;
+            double circleSizeBonus = Math.Pow(Math.Max(0.0, circleSize - high_cs_threshold) / (10.0 - high_cs_threshold), tuning.ReadingHighCsPower) * tuning.ReadingHighCsRate;
             double circleSizeBonusHypers = tuning.ReadingHighCsPenaltyHypers * circleSizeBonus;
 
             for (int i = 0; i < actionNotes.Count - 1; i++)
@@ -364,17 +364,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             }
         }
 
-
-        private static void fakeActionBuff(List<CatchDifficultyHitObject> cdhos, CatchDifficultyConstants tuning)
-        {
-            foreach (var note in cdhos)
-            {
-                // Continue if action is real, so the code after this is for fake actions only
-                if (note.MovementData.IsRealAction) continue;
-
-                note.ReadingData.CombinedReadingFactor *= tuning.ReadingFakeActionBuff;
-            }
-        }
 
         private static void futurePrecisionBuff(List<CatchDifficultyHitObject> cdhos, CatchDifficultyConstants tuning)
         {

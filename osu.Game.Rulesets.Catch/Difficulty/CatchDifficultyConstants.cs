@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public static CatchDifficultyConstants Default { get; } = new CatchDifficultyConstants();
 
         public double SrPreMultiplier { get; init; } = 1.0;
-        public double SrPostMultiplier { get; init; } = 0.88;
+        public double SrPostMultiplier { get; init; } = 0.87;
         public double SrScalerY0 { get; init; } = 1.7; // SrScaled are different in DifficultyPreprocessor.cs; the one written here aren't applied
         public double SrScalerY1 { get; init; } = 4.55;
         public double SrScalerY2 { get; init; } = 6.9;
@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SpeedConsistencyPace { get; init; } = 52.0;
         public double SpeedConsistencyMultiplier { get; init; } = 1.07;
 
-        public double ReadingHighCsPower { get; init; } = 1.9;
-        public double ReadingHighCsRate { get; init; } = 0.41;
+        public double ReadingHighCsPower { get; init; } = 2.5;
+        public double ReadingHighCsRate { get; init; } = 0.19;
         public double ReadingHighCsPenaltyHypers { get; init; } = 0.8;
 
         public double ReadingLocalRhythmPenalty { get; init; } = 0.95;
@@ -85,7 +85,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double ReadingHighVelocityNerf { get; init; } = 0.0;
         public double ReadingHighDistanceBuff { get; init; } = 0.14;
         public double ReadingHighDistancePower { get; init; } = 1.3;
-        public double ReadingFakeActionBuff { get; init; } = 1.07;
         public double ReadingFuturePrecisionBuff { get; init; } = 0.19;
 
         public double StandingWidthAdditiveConstant { get; init; } = 1.24;
@@ -96,6 +95,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double DoubleTimeNerf = 0.03;
 
-        public double FinalPPMultiplier { get; init; } = 1.49;
+        public double FinalPPMultiplier { get; init; } = 1.48;
     }
 }
