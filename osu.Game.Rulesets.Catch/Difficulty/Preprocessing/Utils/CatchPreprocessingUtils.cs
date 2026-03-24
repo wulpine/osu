@@ -47,15 +47,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Utils
         {
             const double standing_bound = 0.6;
 
-            const double linear_decrease = -0.0054;
+            const double linear_decrease = -0.0045;
             double additive_constant = tuning.StandingWidthAdditiveConstant;
-
-            const int series_start_count = 4;
-            const double series_decay = 0.05;
+            const double series_decay = 0.025;
 
             double adjustedDelta = ms * clockRate;
 
-            return Math.Min(1.0, Math.Max(standing_bound, linear_decrease * adjustedDelta + additive_constant)) * (1 + Math.Max(0, wiggleCount - series_start_count) * series_decay);
+            return Math.Min(1.0, Math.Max(standing_bound, linear_decrease * adjustedDelta + additive_constant)) * (1 + Math.Max(0, wiggleCount) * series_decay);
         }
 
         /// <summary>
