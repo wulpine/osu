@@ -166,10 +166,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
 
-            double lowARFullBonusSRRatio = Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
-            if (minApproachRate <= min_ar_threshold)
-                approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
-            hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;
+            // double lowARFullBonusSRRatio = Math.Min(low_ar_full_bonus_sr, sr) / low_ar_full_bonus_sr;
+            // if (minApproachRate <= min_ar_threshold)
+            //     approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
+            // hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;
             
             double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0); // Max at AR0   
 
