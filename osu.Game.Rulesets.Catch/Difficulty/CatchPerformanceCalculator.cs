@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
 
-            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate), true);
+            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate));
 
             // Length bonus: the longer the map is, the hardest it is to set a good score (FC/low misscount).
                 // This bonus is excluded from the SR on purpose: star rating should be an information about "how hard patterns are", while pp: "how hard getting full combo is".
@@ -90,16 +90,19 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 1.0 + linear_pace * Math.Min(1.0, totalActions / cutoff) +
                 (totalActions > cutoff ? Math.Log10(totalActions / cutoff) * logarithmic_pace : 0.0);
 
-            // Length bonus should depend on approachRate (including FlashLight): if it's high enough, it's either draining or it requires memorisation
-            lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
+            // Length bonus should depend on approachRate: if it's high enough, it's either draining or it requires memorisation.
+            if (score.Mods.Any(m => m is ModFlashlight))
+                lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 8.0) / 2.0);
+            else
+                lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
 
-            // Additional length bonus for FL and HDFL
+            // Additional length bonus for FL and HDFL (this part is not dependent on the AR).
             if (score.Mods.Any(m => m is ModFlashlight))
             {
                 if (score.Mods.Any(m => m is ModHidden))
-                    lengthBonus = Math.Pow(lengthBonus, 2.3);
+                    lengthBonus = Math.Pow(lengthBonus, 2.4);
                 else
-                    lengthBonus = Math.Pow(lengthBonus, 1.8);
+                    lengthBonus = Math.Pow(lengthBonus, 2.0);
             }
 
             value *= Math.Pow(accuracy(), 5.5);
@@ -118,20 +121,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         // The following function returns "adjusted approach rate"
-        // For FL, we are calculating the time ("preempt") that takes note to fall between an appearance of the note on the screen (in the highest visible spot) and falling onto the catcher.
-            // After that, we are recalculating AR and using it in AR calculation in DifficultyCalculator.
-        // For DT and HT (or any other rates), we are taking into account that the faster catcher's velocity is, the more player can delay their moves.
+        // For DT (or other rates greater than 1) we are taking into account that the faster catcher's velocity is, the more player can delay their moves.
             // That means, the faster the catcher is, the easier reacting to the falling notes is. We are approximating it in CorrectedClockRate function.
-        public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate, bool withFlashLight = true)
+        // For HT (or any rates smaller than 1) we are using the opposite logic: movement of the catcher takes more time.
+        public static double CalculateApproachRate(Mod[] mods, double approachRate, double correctedClockRate)
         {
             double preempt = IBeatmapDifficultyInfo.DifficultyRange(approachRate, 1800, 1200, 450) / correctedClockRate;
-
-            if (mods.Any(m => m is ModFlashlight) && withFlashLight)
-            {
-                const double flashlight_visibility_time = 203.125 * 0.77 / 440.0; // 203.125 pixels above catcher are visible at 200 combo; 440 pixels is the height of the visible playfield
-                preempt *= flashlight_visibility_time;
-            }
-
             return preempt > 1200.0 ? (1800.0 - preempt) / 120.0 : (1200.0 - preempt) / 150.0 + 5.0;
         }
 

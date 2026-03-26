@@ -107,11 +107,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
 
             // AR calculations
-            // AR bonus and HD bonus contribute to the SR; squared bonuses contribute to the pp value
+            // AR bonus and HD bonus contribute to the star rating; squared bonuses contribute to the pp value
             // adjustedApproachRate takes mods into account (DT, HT, FL), more on that in PerformanceCalculator
             double originalApproachRate = difficulty.ApproachRate;
-            double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate, false); // original AR including clockrate
-            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate), true); //AR artificially modified by changed clockrate or FL
+            double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate); // original AR including clockrate
+            double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate)); //AR artificially modified by changed clockrate or FL
 
             // High AR bonus
             const double first_threshold = 9.0;
@@ -175,16 +175,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
 
             // FL (AR) bonus: the higher AR is, the harder flashlight is.
-                // Here we are working with adjustedApproachRate calculated in PerformanceCalculator.cs which states the relation between "original AR" and "flashlight AR".
                 // Length-based bonuses for FL can be found in PerformanceCalculator.
+            // When FL (or HDFL) is applied, we're modifying approathRateFactor accordingly.
             if (mods.Any(m => m is ModFlashlight))
             {
                 double flashlightApproachRateFactor = 1.0;
-                const double base_fl_bonus = 0.06;
-                const double first_fl_threshold = 8.5; //around AR-0.8 before FL being applied
-                const double first_fl_constant = 0.06;
-                const double second_fl_threshold = 10.5; //around AR6 before FL being applied - threshold for "high AR"
-                const double second_fl_constant = 0.11;
+                const double base_fl_bonus = 0.05;
+                const double first_fl_threshold = 0.0;
+                const double first_fl_constant = 0.02;
+                const double second_fl_threshold = 8.0;
+                const double second_fl_constant = 0.08;
 
                 if (adjustedApproachRate >= first_fl_threshold)
                     flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
