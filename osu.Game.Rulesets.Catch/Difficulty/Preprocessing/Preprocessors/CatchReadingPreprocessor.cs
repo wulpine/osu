@@ -345,6 +345,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
                 if (averageDistance > high_distance_threshold)
                 {
                     note.ReadingData.CombinedReadingFactor *= 1.0 + tuning.ReadingHighDistanceBuff * Math.Pow((averageDistance - high_distance_threshold) / (512.0 - high_distance_threshold), tuning.ReadingHighDistancePower);
+                    note.ReadingData.HighDistanceFactor *= 1.0 + tuning.ReadingHighDistanceBuff * Math.Pow((averageDistance - high_distance_threshold) / (512.0 - high_distance_threshold), tuning.ReadingHighDistancePower);
                 }
             }
         }

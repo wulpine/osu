@@ -494,14 +494,24 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
                     data.KeyPress = data.BackwardKeyPress;
                     data.ForwardCatcherPosition = next.Position + data.Directionize(catcherWidth / 2.0 + next.DeltaTime);
 
-                    if (data.Directionize(next.Position - note.Position) <= -(catcherWidth / 2.0 + next.DeltaTime))
-                    {
-                        double first = data.Directionize(note.Position + next.Position - prevData.LeftCatcherPosition - prevData.RightCatcherPosition + next.DeltaTime) / minimalSpeed;
-                        double second = 2 * prev.StartTime + 2 * note.StartTime;
-                        data.EffectiveTime = (first + second) / 4.0;
+                double catcherCenter = (prevData.LeftCatcherPosition + prevData.RightCatcherPosition) / 2.0;
 
-                        break;
-                    }
+                double movement = data.Directionize(next.Position - note.Position);
+
+                if (movement <= -(catcherWidth / 2.0 + next.DeltaTime))
+                {
+                    double noteOffset = note.Position - catcherCenter;
+                    double nextOffset = next.Position - catcherCenter;
+
+                    noteOffset = data.Directionize(noteOffset);
+                    nextOffset = data.Directionize(nextOffset);
+
+                    double first = (noteOffset + nextOffset + next.DeltaTime) / minimalSpeed;
+                    double second = 2 * prev.StartTime + 2 * note.StartTime;
+                    data.EffectiveTime = (first + second) / 4.0;
+
+                    break;
+                }
 
                     double third = data.Directionize(note.Position - data.Directionize(catcherWidth / 2.0) - prevForwardCatcherPosition) / minimalSpeed;
                     double fourth = catcherWidth / 2.0 - next.DeltaPosition + prev.StartTime + 2 * note.StartTime + next.StartTime;
