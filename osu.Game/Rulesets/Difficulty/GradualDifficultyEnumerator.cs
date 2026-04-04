@@ -49,11 +49,11 @@ namespace osu.Game.Rulesets.Difficulty
             Skills = skills;
         }
 
-        public TimedDifficultyAttributes? CalculateNext(CancellationToken cancellationToken = default)
+        public bool MoveNext(CancellationToken cancellationToken = default)
         {
             var hitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
             if (hitObject == null)
-                return null;
+                return false;
             progressiveBeatmap.HitObjects.Add(hitObject);
 
             while (difficultyHitObjectCursor < difficultyHitObjects.Length)
@@ -72,10 +72,12 @@ namespace osu.Game.Rulesets.Difficulty
                 }
             }
 
-            return new TimedDifficultyAttributes(
-                hitObject.GetEndTime(),
-                createDifficultyAttributes(progressiveBeatmap, mods, Skills, clockRate)
-            );
+            return true;
+        }
+
+        public DifficultyAttributes CreateDifficultyAttributes()
+        {
+            return createDifficultyAttributes(progressiveBeatmap, mods, Skills, clockRate);
         }
 
         public void Skip(int offset)
