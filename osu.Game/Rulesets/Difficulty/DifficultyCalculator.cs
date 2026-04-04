@@ -100,6 +100,28 @@ namespace osu.Game.Rulesets.Difficulty
             return CreateDifficultyAttributes(Beatmap, playableMods, skills, clockRate);
         }
 
+        public GradualDifficultyEnumerator CreateGradualDifficulty([NotNull] IEnumerable<Mod> mods, CancellationToken cancellationToken = default)
+        {
+            using var timedCancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            if (!cancellationToken.CanBeCanceled)
+                cancellationToken = timedCancellationSource.Token;
+
+            cancellationToken.ThrowIfCancellationRequested();
+            preProcess(mods, cancellationToken);
+
+            var skills = CreateSkills(Beatmap, playableMods, clockRate);
+            var difficultyObjects = getDifficultyHitObjects().ToArray();
+            return new GradualDifficultyEnumerator(
+                Beatmap,
+                playableMods,
+                difficultyObjects,
+                skills,
+                clockRate,
+                CreateDifficultyAttributes
+            );
+        }
+
         /// <summary>
         /// Calculates the difficulty of the beatmap with no mods applied and returns a set of <see cref="TimedDifficultyAttributes"/> representing the difficulty at every relevant time value in the beatmap.
         /// </summary>
