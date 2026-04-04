@@ -49,17 +49,16 @@ namespace osu.Game.Rulesets.Difficulty
             Skills = skills;
         }
 
-        public bool MoveNext(CancellationToken cancellationToken = default)
+        private void updateDifficultyHitObjects(CancellationToken cancellationToken)
         {
-            var hitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
-            if (hitObject == null)
-                return false;
-            progressiveBeatmap.HitObjects.Add(hitObject);
+            if (beatmap.HitObjects.Count <= progressiveBeatmap.HitObjects.Count)
+                return;
 
+            var lastHitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
             while (difficultyHitObjectCursor < difficultyHitObjects.Length)
             {
                 var difficultyHitObject = difficultyHitObjects[difficultyHitObjectCursor];
-                if (difficultyHitObject.BaseObject.GetEndTime() > hitObject.GetEndTime())
+                if (difficultyHitObject.BaseObject.GetEndTime() > lastHitObject.GetEndTime())
                 {
                     break;
                 }
@@ -71,8 +70,6 @@ namespace osu.Game.Rulesets.Difficulty
                     skill.Process(difficultyHitObject);
                 }
             }
-
-            return true;
         }
 
         public DifficultyAttributes CreateDifficultyAttributes()
@@ -80,20 +77,41 @@ namespace osu.Game.Rulesets.Difficulty
             return createDifficultyAttributes(progressiveBeatmap, mods, Skills, clockRate);
         }
 
-        public void Skip(int offset)
+        public bool Advance(CancellationToken cancellationToken = default)
         {
-            progressiveBeatmap.HitObjects.AddRange(beatmap.HitObjects.Skip(progressiveBeatmap.HitObjects.Count).Take(offset));
+            if (beatmap.HitObjects.Count <= progressiveBeatmap.HitObjects.Count)
+                return false;
+
+            var hitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
+            progressiveBeatmap.HitObjects.Add(hitObject);
+            updateDifficultyHitObjects(cancellationToken);
+
+            return true;
         }
 
-        public void SkipToTime(double time)
+        public void Skip(int offset, CancellationToken cancellationToken = default)
+        {
+            progressiveBeatmap.HitObjects.AddRange(beatmap.HitObjects.Skip(progressiveBeatmap.HitObjects.Count).Take(offset));
+            updateDifficultyHitObjects(cancellationToken);
+        }
+
+        public void SkipToTime(double time, CancellationToken cancellationToken = default)
         {
             while (progressiveBeatmap.HitObjects.Count < beatmap.HitObjects.Count)
             {
                 var hitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
-                if (hitObject == null || hitObject.StartTime >= time)
+                if (hitObject.StartTime >= time)
                     break;
                 progressiveBeatmap.HitObjects.Add(hitObject);
             }
+
+            updateDifficultyHitObjects(cancellationToken);
+        }
+
+        public void SkipToEnd(CancellationToken cancellationToken = default)
+        {
+            progressiveBeatmap.HitObjects.AddRange(beatmap.HitObjects.Skip(progressiveBeatmap.HitObjects.Count));
+            updateDifficultyHitObjects(cancellationToken);
         }
 
         /// <summary>
