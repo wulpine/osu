@@ -51,10 +51,10 @@ namespace osu.Game.Rulesets.Difficulty
 
         private void updateDifficultyHitObjects(CancellationToken cancellationToken)
         {
-            if (beatmap.HitObjects.Count <= progressiveBeatmap.HitObjects.Count)
-                return;
+            var lastHitObject = beatmap.HitObjects.Count <= progressiveBeatmap.HitObjects.Count
+                ? beatmap.HitObjects[beatmap.HitObjects.Count - 1]
+                : beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
 
-            var lastHitObject = beatmap.HitObjects[progressiveBeatmap.HitObjects.Count];
             while (difficultyHitObjectCursor < difficultyHitObjects.Length)
             {
                 var difficultyHitObject = difficultyHitObjects[difficultyHitObjectCursor];
