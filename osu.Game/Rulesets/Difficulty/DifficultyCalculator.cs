@@ -112,14 +112,21 @@ namespace osu.Game.Rulesets.Difficulty
 
             var skills = CreateSkills(Beatmap, playableMods, clockRate);
             var difficultyObjects = getDifficultyHitObjects().ToArray();
+
             return new GradualDifficultyEnumerator(
                 Beatmap,
                 playableMods,
                 difficultyObjects,
                 skills,
                 clockRate,
-                CreateDifficultyAttributes
+                CreateDifficultyAttributes,
+                setDifficultyHitObjects
             );
+
+            void setDifficultyHitObjects(List<DifficultyHitObject> hitObjects)
+            {
+                DifficultyHitObjects = hitObjects;
+            }
         }
 
         /// <summary>

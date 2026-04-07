@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Difficulty
 
         private readonly Func<IBeatmap, Mod[], Skill[], double, DifficultyAttributes> createDifficultyAttributes;
 
+        private readonly Action<List<DifficultyHitObject>> setDifficultyHitObjects;
+
         public Skill[] Skills { get; }
 
         public GradualDifficultyEnumerator(
@@ -38,7 +40,8 @@ namespace osu.Game.Rulesets.Difficulty
             DifficultyHitObject[] difficultyHitObjects,
             Skill[] skills,
             double clockRate,
-            Func<IBeatmap, Mod[], Skill[], double, DifficultyAttributes> createDifficultyAttributes)
+            Func<IBeatmap, Mod[], Skill[], double, DifficultyAttributes> createDifficultyAttributes,
+            Action<List<DifficultyHitObject>> setDifficultyHitObjects)
         {
             this.beatmap = beatmap;
             progressiveBeatmap = new ProgressiveCalculationBeatmap(beatmap);
@@ -46,6 +49,7 @@ namespace osu.Game.Rulesets.Difficulty
             this.difficultyHitObjects = difficultyHitObjects;
             this.clockRate = clockRate;
             this.createDifficultyAttributes = createDifficultyAttributes;
+            this.setDifficultyHitObjects = setDifficultyHitObjects;
             Skills = skills;
         }
 
@@ -74,6 +78,7 @@ namespace osu.Game.Rulesets.Difficulty
 
         public DifficultyAttributes CreateDifficultyAttributes()
         {
+            setDifficultyHitObjects(difficultyHitObjects[..difficultyHitObjectCursor].ToList());
             return createDifficultyAttributes(progressiveBeatmap, mods, Skills, clockRate);
         }
 
