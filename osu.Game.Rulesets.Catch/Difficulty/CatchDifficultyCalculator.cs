@@ -23,8 +23,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-        private const double large_droplet_buff = 1.01;
-        private const double large_droplet_buff_hidden = 1.02;
+        private const double large_droplet_buff = 1.0;
+        private const double large_droplet_buff_hidden = 1.0;
 
         private readonly CatchDifficultyConstants tuning;
 
