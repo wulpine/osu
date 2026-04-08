@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double ApproachRateSecondConstant { get; init; } = 0.37;
 
-        public double BeginningTimePenaltyPower { get; init; } = 0.5;
-        public double BeginningFullPenalty { get; init; } = 0.53;
+        public double BeginningTimePenaltyPower { get; init; } = 0.45;
+        public double BeginningFullPenalty { get; init; } = 0.6;
 
         public double DefaultDecayWeight { get; init; } = 0.902;
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.18;
 
-        public double PerformanceLengthLinearPace { get; init; } = 0.25;
+        public double PerformanceLengthLinearPace { get; init; } = 0.26;
         public double PerformanceLengthCutoff { get; init; } = 1700;
         public double PerformanceLengthLogarithmicPace { get; init; } = 0.26;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SpeedBurstAmplitude { get; init; } = 19.1;
         public double SpeedBurstShift { get; init; } = -10.0;
         public double SpeedBurstPace { get; init; } = 50.0;
-        public double SpeedBurstMultiplier { get; init; } = 0.99;
+        public double SpeedBurstMultiplier { get; init; } = 0.98;
 
         public double SpeedConsistencyAmplitude { get; init; } = 19.1;
         public double SpeedConsistencyShift { get; init; } = -10.0;
