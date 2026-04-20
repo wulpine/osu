@@ -323,57 +323,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr = sr * tuning.SrPreMultiplier;
 
-            sr = srScaler(sr);
+            if (sr <= 8.75)
+                sr = 0.81 * Math.Pow(sr, 1.16);
+            else
+                sr = 0.45 * (sr - 8.75) + 0.81 * Math.Pow(8.75, 1.16);
 
             sr *= tuning.SrPostMultiplier;
 
             return sr;
-        }
-
-        private double srScaler(double sr)
-        {
-            const double x0 = 0.5;
-            const double y0 = 1.2;
-
-            const double x1 = 2.5;
-            const double y1 = 2.2;
-
-            const double x15 = 3.5;
-            const double y15 = 3.3;
-
-            const double x2 = 4.5;
-            const double y2 = 4.7;
-
-            const double x3 = 5.5;
-            const double y3 = 5.8;
-
-            const double x4 = 6.5;
-            const double y4 = 6.9;
-
-            const double x5 = 7.5;
-            const double y5 = 8.7;
-
-            const double x6 = 8.5;
-            const double y6 = 9.4;
-
-            const double x7 = 9.0;
-            const double y7 = 10.15;
-
-            const double x8 = 10.0;
-            const double y8 = 10.6;
-
-
-            if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
-            if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
-            if (sr <= x15) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x15, y15);
-            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x15, y15, x2, y2);
-            if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
-            if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
-            if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
-            if (sr <= x6) return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
-            if (sr <= x7) return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
-
-            return CatchPreprocessingUtils.Lerp(sr, x7, y7, x8, y8);
         }
 
         /// <summary>
