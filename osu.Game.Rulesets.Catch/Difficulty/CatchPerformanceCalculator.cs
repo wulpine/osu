@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             numKatu = score.GetCountKatu() ?? 0; // HitResult.SmallTickMiss
             numMiss = score.GetCountMiss() ?? 0; // HitResult.Miss PLUS HitResult.LargeTickMiss
 
-            double value = calculateValue(catchAttributes.SRBeginningNerfed);
+            double value = calculateValue(catchAttributes.StarRating);
 
 
             // Miss penalty: as our system is highly sensitive towards "difficulty spikes" (which allows us to reward more variety of skillsets),

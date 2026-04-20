@@ -98,8 +98,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             //double approachRate = difficulty.ApproachRate;
 
-            double sr = calculateSr(startTimes, combinedStrains);
-            double srBeginningNerfed = calculateSr(notes, sorted);
+            double sr = calculateSr(notes, sorted);
             // List<double> srWithMisses = new[] { 1, 2, 4, 7, 12 }.Select(m => calculateSr(notes, sorted, m)).ToList();
 
             // double precision = calculateSr(startTimes, combineStrains(actionProbabilities, precisionStrains, zeroes, readingFactors, highCSFactors));
@@ -226,7 +225,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 HiddenFactor = hiddenFactor,
                 // PrecisionSR = precision,
                 // SpeedSR = speed,
-                SRBeginningNerfed = srBeginningNerfed * combinedMultiplier,
                 Tuning = tuning,
             };
 
