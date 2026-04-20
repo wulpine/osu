@@ -22,6 +22,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         [JsonProperty("hidden_factor")]
         public double HiddenFactor { get; set; }
 
+        [JsonProperty("length_factor")]
+        public double LengthFactor { get; set; }
+
         // /// <summary>
         // /// Temporary debug property.
         // /// </summary>

@@ -203,13 +203,45 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
             {
                 const double hdfl_bonus = 0.08;
-                
+
                 approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + hdfl_bonus);
                 hiddenFactor = 1.0; // We have moved both bonuses into approachRateFactor so we set hiddenFactor to 1 to avoid double-counting
             }
 
+            // Length bonus: the longer the map is, the hardest it is to set a good score (FC/low misscount).
+            // The base length measure is the number of actions: our calculations performed in preprocessing let us approximate how many times player has to change combination of keys they are holding.
+                // Some undetected actions aren't detected due to limitations of the algorithm. We approximate their number with 25% of the maximum combo.
+            const double combo_percentage = 0.25;
+            int maxCombo = beatmap.GetMaxCombo();
+            double adjustedTotalActions = totalActions + combo_percentage * maxCombo;
 
-            double combinedMultiplier = approachRateFactor * hiddenFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
+            double linear_pace = tuning.PerformanceLengthLinearPace;
+            double cutoff = tuning.PerformanceLengthCutoff;
+            double logarithmic_pace = tuning.PerformanceLengthLogarithmicPace;
+
+            // Pace is linear at first, then it's logarithmic (growth is slower).
+            double lengthFactor =
+                1.0 + linear_pace * Math.Min(1.0, adjustedTotalActions / cutoff) +
+                (adjustedTotalActions > cutoff ? Math.Log10(adjustedTotalActions / cutoff) * logarithmic_pace : 0.0);
+
+            // Length bonus should depend on approachRate: if it's high enough, it's either draining or it requires memorisation.
+            if (mods.Any(m => m is ModFlashlight))
+                lengthFactor = Math.Pow(lengthFactor, 1.0 + Math.Max(0, adjustedApproachRate - 8.0) / 2.0);
+            else
+                lengthFactor = Math.Pow(lengthFactor, 1.0 + Math.Max(0, adjustedApproachRate - 10.3) / 2.0);
+
+            // Additional length bonus for FL and HDFL (this part is not dependent on the AR).
+            if (mods.Any(m => m is ModFlashlight))
+            {
+                if (mods.Any(m => m is ModHidden))
+                    lengthFactor = Math.Pow(lengthFactor, 2.4);
+                else
+                    lengthFactor = Math.Pow(lengthFactor, 2.0);
+            }
+
+            lengthFactor = Math.Sqrt(1 + (lengthFactor - 1) / tuning.PerformanceValueMultiplier); // SR-pp scaling
+
+            double combinedMultiplier = approachRateFactor * hiddenFactor * lengthFactor * Math.Sqrt(tuning.FinalPPMultiplier) * Math.Sqrt(tuning.PerformanceValueMultiplier);
             if (clockRate >= 1.0)
                 combinedMultiplier *= 1.0 - 2.0 * tuning.DoubleTimeNerf * (clockRate - 1.0);
             else if (clockRate > 0.0)
@@ -219,10 +251,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 StarRating = sr * combinedMultiplier,
                 Mods = mods,
-                MaxCombo = beatmap.GetMaxCombo(),
+                MaxCombo = maxCombo,
                 TotalActions = totalActions,
                 ApproachRateFactor = approachRateFactor,
                 HiddenFactor = hiddenFactor,
+                LengthFactor = lengthFactor,
                 // PrecisionSR = precision,
                 // SpeedSR = speed,
                 Tuning = tuning,
