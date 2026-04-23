@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SrScalerY6 { get; init; } = 11.0;
         public double SrOffset { get; init; } = 0.0; // Not used
 
-        public double ApproachRateSecondConstant { get; init; } = 0.37;
+        public double ApproachRateSecondConstant { get; init; } = 0.33;
 
         public double BeginningTimePenaltyPower { get; init; } = 0.45;
         public double BeginningFullPenalty { get; init; } = 0.6;
@@ -33,9 +33,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.18;
 
-        public double PerformanceLengthLinearPace { get; init; } = 0.26;
+        public double PerformanceLengthLinearPace { get; init; } = 0.28;
         public double PerformanceLengthCutoff { get; init; } = 1700;
-        public double PerformanceLengthLogarithmicPace { get; init; } = 0.26;
+        public double PerformanceLengthLogarithmicPace { get; init; } = 0.28;
 
         public double PerformanceValueMultiplier { get; init; } = 1.05;
 
@@ -95,6 +95,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double DoubleTimeNerf = 0.03;
 
-        public double FinalPPMultiplier { get; init; } = 1.48;
+        public double FinalPPMultiplier { get; init; } = 1.5;
     }
 }
