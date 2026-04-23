@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
     public static class CatchReadingPreprocessor
     {
         private const double high_cs_threshold = 2.0;
+        private const double very_high_cs_power = 0.8;
+        private const double very_high_cs_rate = 0.06;
 
         private const double local_rhythm_range = 20.0;
         private const double local_rhythm_sensitivity = 2.0;
@@ -352,7 +354,10 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 
         private static void highCSBuff(List<CatchDifficultyHitObject> actionNotes, double circleSize, CatchDifficultyConstants tuning)
         {
-            double circleSizeBonus = Math.Pow(Math.Max(0.0, circleSize - high_cs_threshold) / (10.0 - high_cs_threshold), tuning.ReadingHighCsPower) * tuning.ReadingHighCsRate;
+            double baseCircleSizeBonus = Math.Pow(Math.Max(0.0, circleSize - high_cs_threshold) / (10.0 - high_cs_threshold), tuning.ReadingHighCsPower) * tuning.ReadingHighCsRate;
+            double veryHighCircleSizeBonus = Math.Pow(Math.Max(0.0, circleSize - high_cs_threshold) / (10.0 - high_cs_threshold), tuning.ReadingHighCsPower + very_high_cs_power * circleSize) * very_high_cs_rate;
+            double circleSizeBonus = baseCircleSizeBonus + veryHighCircleSizeBonus;
+
             double circleSizeBonusHypers = tuning.ReadingHighCsPenaltyHypers * circleSizeBonus;
 
             for (int i = 0; i < actionNotes.Count - 1; i++)
