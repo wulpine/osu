@@ -469,10 +469,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double low_speed_threshold = tuning.LowSpeedThresholdLSR;
             double unaffected_percentage = tuning.UnaffectedPercantagePrecisionLSR;
 
+            const double low_speed_power = 0.8;
+
             // "Low diffs +HR nerf": the purpose is to nerf precise notes supposing the pattern is sufficiently slow
             // Example of the affected map: 2696377 +HR
             if (speedStrain < tuning.LowSpeedThresholdLSR)
-                precisionStrain = precisionStrain * (tuning.UnaffectedPercantagePrecisionLSR + (1.0 - tuning.UnaffectedPercantagePrecisionLSR) * speedStrain / tuning.LowSpeedThresholdLSR);
+                precisionStrain = precisionStrain * (tuning.UnaffectedPercantagePrecisionLSR + (1.0 - tuning.UnaffectedPercantagePrecisionLSR) * Math.Pow(speedStrain / tuning.LowSpeedThresholdLSR, low_speed_power));
 
             return tuning.LocalStarRatingMaxConstant * Math.Max(precisionStrain, speedStrain)
                    + tuning.LocalStarRatingMinConstant * Math.Min(precisionStrain, speedStrain)
