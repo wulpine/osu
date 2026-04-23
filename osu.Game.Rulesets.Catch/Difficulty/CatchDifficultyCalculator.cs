@@ -323,10 +323,15 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr = sr * tuning.SrPreMultiplier;
 
-            if (sr <= 8.75)
+            // if (sr <= 8.75)
+            //     sr = 0.81 * Math.Pow(sr, 1.16);
+            // else
+            //     sr = 0.45 * (sr - 8.75) + 0.81 * Math.Pow(8.75, 1.16);
+
+            if (sr <= 6.5)
                 sr = 0.81 * Math.Pow(sr, 1.16);
             else
-                sr = 0.45 * (sr - 8.75) + 0.81 * Math.Pow(8.75, 1.16);
+                sr = 15.65 * Math.Pow(sr, 0.3) - 20.33;
 
             sr *= tuning.SrPostMultiplier;
 
