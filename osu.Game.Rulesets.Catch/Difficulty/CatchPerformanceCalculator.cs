@@ -3,11 +3,13 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
 using osu.Game.Scoring.Legacy;
+using osu.Game.Utils;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -63,14 +65,57 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (catchAttributes.MaxCombo > 0)
                 value *= Math.Min(Math.Pow(score.MaxCombo, scaling_power) / Math.Pow(catchAttributes.MaxCombo, scaling_power), 1.0);
 
+            var difficulty = score.BeatmapInfo!.Difficulty.Clone();
+
+            score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
+
+            double clockRate = ModUtils.CalculateRateWithMods(score.Mods);
+
+            double approachRate = CalculateApproachRate(score.Mods, difficulty.ApproachRate, CorrectedClockRate(clockRate));
+
+            // Length bonus: the longer the map is, the hardest it is to set a good score (FC/low misscount).
+                // This bonus is excluded from the SR on purpose: star rating should be an information about "how hard patterns are", while pp: "how hard getting full combo is".
+            // The base length measure is the number of actions: our calculations performed in preprocessing let us approximate how many times player has to change combination of keys they are holding.
+                // Some undetected actions aren't detected due to limitations of the algorithm. We approximate their number with 25% of the maximum combo.
+            const double combo_percentage = 0.25;
+            double maxCombo = catchAttributes.MaxCombo;
+            double totalActions = ((CatchDifficultyAttributes)attributes).TotalActions + combo_percentage * maxCombo;
+
+            double linear_pace = tuning.PerformanceLengthLinearPace;
+            double cutoff = tuning.PerformanceLengthCutoff;
+            double logarithmic_pace = tuning.PerformanceLengthLogarithmicPace;
+
+            // Pace is linear at first, then it's logarithmic (growth is slower).
+            double lengthBonus =
+                1.0 + linear_pace * Math.Min(1.0, totalActions / cutoff) +
+                (totalActions > cutoff ? Math.Log10(totalActions / cutoff) * logarithmic_pace : 0.0);
+
+            // Length bonus should depend on approachRate: if it's high enough, it's either draining or it requires memorisation.
+            if (score.Mods.Any(m => m is ModFlashlight))
+                lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 8.0) / 2.0);
+            else
+                lengthBonus = Math.Pow(lengthBonus, 1.0 + Math.Max(0, approachRate - 10.3) / 2.0);
+
+            // Additional length bonus for FL and HDFL (this part is not dependent on the AR).
+            if (score.Mods.Any(m => m is ModFlashlight))
+            {
+                if (score.Mods.Any(m => m is ModHidden))
+                    lengthBonus = Math.Pow(lengthBonus, 2.4);
+                else
+                    lengthBonus = Math.Pow(lengthBonus, 2.0);
+            }
+
             value *= Math.Pow(accuracy(), 5.5);
 
             if (score.Mods.Any(m => m is ModNoFail))
                 value *= Math.Max(0.90, 1.0 - 0.02 * numMiss);
 
+            double lengthBonusPP = value / (tuning.PerformanceValueMultiplier) * (lengthBonus - 1.0);
+
             return new CatchPerformanceAttributes
             {
-                Total = value,
+                LengthBonus = lengthBonusPP,
+                Total = (value + lengthBonusPP),
                 Tuning = tuning,
             };
         }
