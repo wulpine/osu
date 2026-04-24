@@ -489,11 +489,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double plsr = CalculatePartialLocalStarRating(precisionStrain, speedStrain, tuning);
 
             // Distance-based term for very easy notes that raises star rating for "0* maps"
-            if (actionProbability == 0)
-                plsr = 2.0 * distanceBonus; // minimal precision strain for any action note is higher than maximal distance bonus for non-action notes
+            plsr = Math.Max(plsr, 2.0 * distanceBonus);
 
             return plsr * readingFactor * highCSFactor;
-            //return Math.Sqrt(Math.Pow(plsr, 2) + Math.Pow(1 - actionProbability, 2) * Math.Pow(aimStrain, 2)) * readingFactor;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
