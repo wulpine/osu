@@ -52,6 +52,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double totalActions = totalMovements;
 
             List<double> startTimes = DifficultyHitObjects.Select(n => ((CatchDifficultyHitObject)n).StartTime).ToList();
+            List<double> distanceBonuses = DifficultyHitObjects.Select(n => ((CatchDifficultyHitObject)n).MovementData.DistanceBonus).ToList();
             List<double> actionProbabilities = DifficultyHitObjects.Select(n => ((CatchDifficultyHitObject)n).MovementData.ActionProbability).ToList();
             List<double> precisionStrains = skills.OfType<Precision>().Single().GetObjectDifficulties().ToList();
             List<double> speedStrains = skills.OfType<Speed>().Single().GetObjectDifficulties().ToList();
@@ -74,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             // List<double> zeroes = Enumerable.Repeat(0.0, precisionStrains.Count).ToList();
 
-            List<double> combinedStrains = combineStrains(actionProbabilities, precisionStrains, speedStrains, readingFactors, highCSFactors);
+            List<double> combinedStrains = combineStrains(actionProbabilities, precisionStrains, speedStrains, distanceBonuses, readingFactors, highCSFactors);
 
             // 2B Hotfix
             // for (int i = 1; i < combinedStrains.Count - 1; i++)
@@ -169,8 +170,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             // if (minApproachRate <= min_ar_threshold)
             //     approachRateFactor = 1.0 + (approachRateFactor - 1.0) * lowARFullBonusSRRatio;
             // hiddenFactor = 1.0 + (hiddenFactor - 1.0) * lowARFullBonusSRRatio;
-            
-            double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0); // Max at AR0   
+
+            double maxLowARFactor = 1.0 + (Math.Sqrt(1.0 + low_ar_bonus * min_ar_threshold) - 1.0); // Max at AR0
 
 
             // FL (AR) bonus: the higher AR is, the harder flashlight is.
@@ -446,7 +447,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return false;
         }
 
-        private List<double> combineStrains(List<double> actionProbabilities, List<double> precisionStrains, List<double> speedStrains, List<double> readingFactors, List<double> highCSFactors)
+        private List<double> combineStrains(List<double> actionProbabilities, List<double> precisionStrains, List<double> speedStrains, List<double> distanceBonuses, List<double> readingFactors, List<double> highCSFactors)
         {
             List<double> combinedStrains = new List<double>();
 
@@ -455,16 +456,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 double actionProbability = actionProbabilities[i];
                 double precisionStrain = precisionStrains[i];
                 double speedStrain = speedStrains[i];
+                double distanceBonus = distanceBonuses[i];
                 double readingFactor = readingFactors[i];
                 double highCSFactor = highCSFactors[i];
 
-                combinedStrains.Add(CalculateLocalStarRating(actionProbability, precisionStrain, speedStrain, readingFactor, highCSFactor, tuning));
+                combinedStrains.Add(CalculateLocalStarRating(actionProbability, precisionStrain, speedStrain, distanceBonus, readingFactor, highCSFactor, tuning));
             }
 
             return combinedStrains;
         }
 
-        public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, CatchDifficultyConstants tuning)
+        public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, double distanceBonus, CatchDifficultyConstants tuning)
         {
             double low_speed_threshold = tuning.LowSpeedThresholdLSR;
             double unaffected_percentage = tuning.UnaffectedPercantagePrecisionLSR;
@@ -478,13 +480,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return tuning.LocalStarRatingMaxConstant * Math.Max(precisionStrain, speedStrain)
                    + tuning.LocalStarRatingMinConstant * Math.Min(precisionStrain, speedStrain)
-                   + tuning.LocalStarRatingCorrelationConstant * Math.Pow(precisionStrain, 0.25) * Math.Pow(speedStrain, 0.5);
+                   + tuning.LocalStarRatingCorrelationConstant * Math.Pow(precisionStrain, 0.25) * Math.Pow(speedStrain, 0.5)
+                   + distanceBonus;
         }
 
-        public static double CalculateLocalStarRating(double actionProbability, double precisionStrain, double speedStrain, double readingFactor, double highCSFactor,
+        public static double CalculateLocalStarRating(double actionProbability, double precisionStrain, double speedStrain, double distanceBonus, double readingFactor, double highCSFactor,
                                                       CatchDifficultyConstants tuning)
         {
-            double plsr = CalculatePartialLocalStarRating(precisionStrain, speedStrain, tuning);
+            double plsr = CalculatePartialLocalStarRating(precisionStrain, speedStrain, distanceBonus, tuning);
 
             return plsr * readingFactor * highCSFactor;
             //return Math.Sqrt(Math.Pow(plsr, 2) + Math.Pow(1 - actionProbability, 2) * Math.Pow(aimStrain, 2)) * readingFactor;

@@ -29,11 +29,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         {
             double precision = PrecisionEvaluator.EvaluateDifficultyOf(current);
             double speed = SpeedEvaluator.EvaluateDifficultyOf(current);
+            double distanceBonus = ((CatchDifficultyHitObject)current).MovementData.DistanceBonus;
             double actionProbability = ((CatchDifficultyHitObject)current).MovementData.ActionProbability;
             double readingFactor = ((CatchDifficultyHitObject)current).ReadingData.CombinedReadingFactor;
             double highCSFactor = ((CatchDifficultyHitObject)current).ReadingData.HighCSFactor;
 
-            return CatchDifficultyCalculator.CalculateLocalStarRating(actionProbability, precision, speed, readingFactor, highCSFactor, tuning) / 3.0;
+            return CatchDifficultyCalculator.CalculateLocalStarRating(actionProbability, precision, speed, distanceBonus, readingFactor, highCSFactor, tuning) / 3.0;
         }
     }
 }

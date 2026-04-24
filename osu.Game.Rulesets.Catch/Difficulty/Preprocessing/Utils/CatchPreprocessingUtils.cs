@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Utils
                 double actionProbability = cdho.MovementData.ActionProbability;
                 double speedStrain = SpeedEvaluator.EvaluateDifficultyOf(cdho);
                 double precisionStrain = PrecisionEvaluator.EvaluateDifficultyOf(cdho);
+                double distanceBonus = cdho.MovementData.DistanceBonus;
                 double readingFactor = cdho.ReadingData.CombinedReadingFactor;
                 double highCSFactor = cdho.ReadingData.HighCSFactor;
 
@@ -35,8 +36,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Utils
                 cdho.DisplayData.CatcherWidth = catcherWidth;
                 cdho.DisplayData.SpeedType = speedType;
                 cdho.DisplayData.NoteSpeed = speedStrain;
-                cdho.DisplayData.PartialLocalStarRating = CatchDifficultyCalculator.CalculatePartialLocalStarRating(precisionStrain, speedStrain, tuning);
-                cdho.DisplayData.LocalStarRating = CatchDifficultyCalculator.CalculateLocalStarRating(actionProbability, precisionStrain, speedStrain, readingFactor, highCSFactor, tuning);
+                cdho.DisplayData.PartialLocalStarRating = CatchDifficultyCalculator.CalculatePartialLocalStarRating(precisionStrain, speedStrain, distanceBonus, tuning);
+                cdho.DisplayData.LocalStarRating = CatchDifficultyCalculator.CalculateLocalStarRating(actionProbability, precisionStrain, speedStrain, distanceBonus, readingFactor, highCSFactor, tuning);
                 cdho.DisplayData.CatcherStandingWidth = MillisecondsToCatcherStandingWidth(next.DeltaTime, prev.MovementData.StackWiggleCount, clockRate, tuning);
                 cdho.DisplayData.SignificantMovementDirection = cdho.SignificantMovementDirection(catcherWidth, clockRate);
                 cdho.DisplayData.NoteCombo = i + 1;
