@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     hiddenFactor = 1.01 + hidden_growth * Math.Pow(((11.0 - minApproachRate) / 3.0), hidden_power);
                 if (minApproachRate < 8.0 && minApproachRate >= 5.0)
                     hiddenFactor = 1.01 + hidden_growth * (1.0 + hidden_power * (8.0 - minApproachRate) / 3.0); //tangent line to the function above at point threshold_linear
-                else // Pace of time->AR function is slower below AR5
+                if (minApproachRate < 5.0) // Pace of time->AR function is slower below AR5
                     hiddenFactor = 1.01 + hidden_growth * (1.0 + hidden_power * (3.0 + 1.25 * (5.0 - minApproachRate)) / 3.0);
 
                 hiddenFactor = Math.Sqrt(hiddenFactor); // SR-pp scaling
