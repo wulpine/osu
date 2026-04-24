@@ -466,7 +466,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return combinedStrains;
         }
 
-        public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, double distanceBonus, CatchDifficultyConstants tuning)
+        public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, CatchDifficultyConstants tuning)
         {
             double low_speed_threshold = tuning.LowSpeedThresholdLSR;
             double unaffected_percentage = tuning.UnaffectedPercantagePrecisionLSR;
@@ -480,14 +480,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             return tuning.LocalStarRatingMaxConstant * Math.Max(precisionStrain, speedStrain)
                    + tuning.LocalStarRatingMinConstant * Math.Min(precisionStrain, speedStrain)
-                   + tuning.LocalStarRatingCorrelationConstant * Math.Pow(precisionStrain, 0.25) * Math.Pow(speedStrain, 0.5)
-                   + distanceBonus;
+                   + tuning.LocalStarRatingCorrelationConstant * Math.Pow(precisionStrain, 0.25) * Math.Pow(speedStrain, 0.5);
         }
 
         public static double CalculateLocalStarRating(double actionProbability, double precisionStrain, double speedStrain, double distanceBonus, double readingFactor, double highCSFactor,
                                                       CatchDifficultyConstants tuning)
         {
-            double plsr = CalculatePartialLocalStarRating(precisionStrain, speedStrain, distanceBonus, tuning);
+            double plsr = CalculatePartialLocalStarRating(precisionStrain, speedStrain, tuning);
+
+            // Distance-based term for very easy notes that raises star rating for "0* maps"
+            if (actionProbability == 0)
+                plsr = 2.0 * distanceBonus; // minimal precision strain for any action note is higher than maximal distance bonus for non-action notes
 
             return plsr * readingFactor * highCSFactor;
             //return Math.Sqrt(Math.Pow(plsr, 2) + Math.Pow(1 - actionProbability, 2) * Math.Pow(aimStrain, 2)) * readingFactor;

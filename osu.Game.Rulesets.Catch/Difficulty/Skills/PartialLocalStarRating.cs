@@ -29,9 +29,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         {
             double precision = PrecisionEvaluator.EvaluateDifficultyOf(current);
             double speed = SpeedEvaluator.EvaluateDifficultyOf(current);
-            double distanceBonus = ((CatchDifficultyHitObject)current).MovementData.DistanceBonus;
 
-            return CatchDifficultyCalculator.CalculatePartialLocalStarRating(precision, speed, distanceBonus, tuning) / 3.0;
+            return CatchDifficultyCalculator.CalculatePartialLocalStarRating(precision, speed, tuning) / 3.0;
         }
     }
 }

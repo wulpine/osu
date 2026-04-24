@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
             double maximalDistance = Math.Abs(next.Position - maximalPosition);
             double maximalVelocity = maximalDistance / Math.Max(next.DeltaTime - frameTime, 1);
             data.IsHyperWalk = maximalVelocity * next.DeltaTime / 2.0 >= maximalDistance - catcherWidth / 2.0 && note.IsHyper;
-            data.DistanceBonus = Math.Min(0.6 * catcherWidth, note.DeltaPosition / catcherWidth);
+            data.DistanceBonus = Math.Min(0.6, note.DeltaPosition / catcherWidth);
         }
 
         /// <summary>
