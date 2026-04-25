@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SrScalerY6 { get; init; } = 11.0;
         public double SrOffset { get; init; } = 0.0; // Not used
 
-        public double ApproachRateSecondConstant { get; init; } = 0.33;
+        public double ApproachRateSecondConstant { get; init; } = 0.34;
 
         public double BeginningTimePenaltyPower { get; init; } = 0.45;
         public double BeginningFullPenalty { get; init; } = 0.6;
@@ -94,6 +94,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double DoubleTimeNerf = 0.03;
 
-        public double FinalPPMultiplier { get; init; } = 1.5;
+        public double FinalPPMultiplier { get; init; } = 1.56;
     }
 }

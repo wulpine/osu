@@ -119,14 +119,14 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             const double first_power = 1.7;
             const double second_power = 1.15;
-            const double first_constant = 0.12;
+            const double first_constant = 0.1;
             double second_constant = tuning.ApproachRateSecondConstant;
 
             double approachRateFactor = 1.0;
-            if (adjustedApproachRate >= first_threshold && adjustedApproachRate < second_threshold)
-                approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - first_threshold) / (second_threshold - first_threshold), first_power) * first_constant;
-            if (adjustedApproachRate >= second_threshold)
-                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - second_threshold) / (11.0 - second_threshold), second_power) * second_constant;
+            if (adjustedApproachRate >= 9.0 && adjustedApproachRate < 10.15)
+                approachRateFactor = 1.0 + Math.Pow((adjustedApproachRate - 9.0) / 1.15, first_power) * first_constant;
+            if (adjustedApproachRate >= 10.15)
+                approachRateFactor = 1.0 + first_constant + Math.Pow((adjustedApproachRate - 10.15) / 0.85, second_power) * second_constant;
             if (adjustedApproachRate > 11.0)
                 approachRateFactor = 1.0 + first_constant + second_constant; // max bonus at AR11 (for extended Lazer's scale/for FL to avoid breaking further calculations)
             approachRateFactor = Math.Sqrt(approachRateFactor);
@@ -297,9 +297,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             sr *= 0.015;
 
             if (sr <= 6.0)
-                sr = 0.52 * Math.Pow(sr, 1.4);
+                sr = 0.5 * Math.Pow(sr, 1.4);
             else
-                sr = 0.52 * Math.Pow(6.0, 1.4) + 1.4 * Math.Pow(sr - 6.0, 0.85);
+                sr = 0.5 * Math.Pow(6.0, 1.4) + 1.4 * Math.Pow(sr - 6.0, 0.86);
 
             sr *= tuning.SrPostMultiplier;
 
