@@ -100,9 +100,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (score.Mods.Any(m => m is ModFlashlight))
             {
                 if (score.Mods.Any(m => m is ModHidden))
-                    lengthBonus = Math.Pow(lengthBonus, 2.4);
+                    lengthBonus = Math.Pow(lengthBonus, 2.1);
                 else
-                    lengthBonus = Math.Pow(lengthBonus, 2.0);
+                    lengthBonus = Math.Pow(lengthBonus, 1.7);
             }
 
             value *= Math.Pow(accuracy(), 5.5);
