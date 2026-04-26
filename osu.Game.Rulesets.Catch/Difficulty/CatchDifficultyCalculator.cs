@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             const double first_power = 1.7;
             const double second_power = 1.15;
-            const double first_constant = 0.12;
+            const double first_constant = 0.11;
             double second_constant = tuning.ApproachRateSecondConstant;
 
             double approachRateFactor = 1.0;
@@ -182,9 +182,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (mods.Any(m => m is ModFlashlight))
             {
                 double flashlightApproachRateFactor = 1.0;
-                const double base_fl_bonus = 0.05;
+                const double base_fl_bonus = 0.04;
                 const double first_fl_constant = 0.02;
-                const double second_fl_constant = 0.07;
+                const double second_fl_constant = 0.05;
 
                 if (adjustedApproachRate >= 0.0)
                     flashlightApproachRateFactor = 1.0 + first_fl_constant * adjustedApproachRate;
@@ -471,9 +471,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public static double CalculatePartialLocalStarRating(double precisionStrain, double speedStrain, CatchDifficultyConstants tuning)
         {
-            double low_speed_threshold = tuning.LowSpeedThresholdLSR;
-            double unaffected_percentage = tuning.UnaffectedPercantagePrecisionLSR;
-
             const double low_speed_power = 0.8;
 
             // "Low diffs +HR nerf": the purpose is to nerf precise notes supposing the pattern is sufficiently slow

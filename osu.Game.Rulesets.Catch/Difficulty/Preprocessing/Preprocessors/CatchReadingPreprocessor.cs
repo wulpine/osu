@@ -13,8 +13,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Preprocessing.Preprocessors
 {
     public static class CatchReadingPreprocessor
     {
-        private const double high_cs_threshold = 2.0;
-        private const double very_high_cs_power = 0.8;
+        private const double high_cs_threshold = 3.0;
+        private const double very_high_cs_power = 0.7;
         private const double very_high_cs_rate = 0.06;
 
         private const double local_rhythm_range = 20.0;
