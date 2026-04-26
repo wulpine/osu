@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double SrScalerY6 { get; init; } = 11.0;
         public double SrOffset { get; init; } = 0.0; // Not used
 
-        public double ApproachRateSecondConstant { get; init; } = 0.34;
+        public double ApproachRateSecondConstant { get; init; } = 0.37;
 
         public double BeginningTimePenaltyPower { get; init; } = 0.45;
         public double BeginningFullPenalty { get; init; } = 0.6;
@@ -25,16 +25,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double DefaultDecayWeight { get; init; } = 0.902;
         public double[] DecayWeights { get; init; } = new[] { 0.88, 0.83, 0.78, 0.71, 0.65 };
 
-        public double LowSpeedThresholdLSR { get; init; } = 7.0;
-        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.5;
+        public double LowSpeedThresholdLSR { get; init; } = 10.0;
+        public double UnaffectedPercantagePrecisionLSR { get; init; } = 0.65;
 
         public double LocalStarRatingMaxConstant { get; init; } = 1.06;
         public double LocalStarRatingMinConstant { get; init; } = 0.85;
         public double LocalStarRatingCorrelationConstant { get; init; } = 0.18;
 
-        public double PerformanceLengthLinearPace { get; init; } = 0.28;
+        public double PerformanceLengthLinearPace { get; init; } = 0.26;
         public double PerformanceLengthCutoff { get; init; } = 1700;
-        public double PerformanceLengthLogarithmicPace { get; init; } = 0.28;
+        public double PerformanceLengthLogarithmicPace { get; init; } = 0.26;
 
         public double PerformanceValueMultiplier { get; init; } = 1.05;
 
@@ -94,6 +94,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public double DoubleTimeNerf = 0.03;
 
-        public double FinalPPMultiplier { get; init; } = 1.56;
+        public double FinalPPMultiplier { get; init; } = 1.48;
     }
 }

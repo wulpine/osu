@@ -97,8 +97,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             var difficulty = beatmap.BeatmapInfo.Difficulty.Clone();
             mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
 
-            //double approachRate = difficulty.ApproachRate;
-
             double sr = calculateSr(notes, sorted);
             // List<double> srWithMisses = new[] { 1, 2, 4, 7, 12 }.Select(m => calculateSr(notes, sorted, m)).ToList();
 
@@ -113,13 +111,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double approachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, clockRate); // original AR including clockrate
             double adjustedApproachRate = CatchPerformanceCalculator.CalculateApproachRate(mods, originalApproachRate, CatchPerformanceCalculator.CorrectedClockRate(clockRate)); //AR artificially modified by changed clockrate or FL
 
-            // High AR bonus
-            const double first_threshold = 9.0;
-            const double second_threshold = 10.15; //adjusted AR for AR9+DT
-
             const double first_power = 1.7;
             const double second_power = 1.15;
-            const double first_constant = 0.1;
+            const double first_constant = 0.12;
             double second_constant = tuning.ApproachRateSecondConstant;
 
             double approachRateFactor = 1.0;
@@ -189,15 +183,13 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 double flashlightApproachRateFactor = 1.0;
                 const double base_fl_bonus = 0.05;
-                const double first_fl_threshold = 0.0;
                 const double first_fl_constant = 0.02;
-                const double second_fl_threshold = 7.5;
-                const double second_fl_constant = 0.04;
+                const double second_fl_constant = 0.07;
 
-                if (adjustedApproachRate >= first_fl_threshold)
-                    flashlightApproachRateFactor = 1.0 + first_fl_constant * (adjustedApproachRate - first_fl_threshold);
-                if (adjustedApproachRate >= second_fl_threshold)
-                    flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - second_fl_threshold);
+                if (adjustedApproachRate >= 0.0)
+                    flashlightApproachRateFactor = 1.0 + first_fl_constant * adjustedApproachRate;
+                if (adjustedApproachRate >= 8.0)
+                    flashlightApproachRateFactor += second_fl_constant * (Math.Min(12.0, adjustedApproachRate) - 8.0);
                 flashlightApproachRateFactor *= 1.0 + base_fl_bonus;
 
                 // The following line makes sure that FL doesn't give less pp than NM
@@ -211,9 +203,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 // Length-based bonus for HDFL can be found in PerformanceCalculator.
             if (mods.Any(m => m is ModFlashlight) && mods.Any(m => m is ModHidden))
             {
-                const double hdfl_bonus = 0.07;
+                const double base_hdfl_bonus = 0.07;
 
-                approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + hdfl_bonus);
+                approachRateFactor = Math.Max(approachRateFactor, hiddenFactor) * (1.0 + base_hdfl_bonus);
                 hiddenFactor = 1.0; // We have moved both bonuses into approachRateFactor so we set hiddenFactor to 1 to avoid double-counting
             }
 
@@ -296,15 +288,59 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             sr *= 0.015;
 
-            if (sr <= 6.0)
-                sr = 0.5 * Math.Pow(sr, 1.4);
-            else
-                sr = 0.5 * Math.Pow(6.0, 1.4) + 1.4 * Math.Pow(sr - 6.0, 0.86);
+            sr = srScaler(sr);
 
             sr *= tuning.SrPostMultiplier;
 
             return sr;
         }
+
+        private double srScaler(double sr)
+        {
+            const double x0 = 0.5;
+            const double y0 = 1.2;
+
+            const double x1 = 2.5;
+            const double y1 = 2.2;
+
+            const double x2 = 3.5;
+            const double y2 = 3.3;
+
+            const double x3 = 4.5;
+            const double y3 = 4.7;
+
+            const double x4 = 5.5;
+            const double y4 = 5.8;
+
+            const double x5 = 6.5;
+            const double y5 = 6.9;
+
+            const double x6 = 7.5;
+            const double y6 = 8.7;
+
+            const double x7 = 8.5;
+            const double y7 = 9.4;
+
+            const double x8 = 9.0;
+            const double y8 = 10.15;
+
+            const double x9 = 10.0;
+            const double y9 = 10.6;
+
+
+            if (sr <= x0) return CatchPreprocessingUtils.Lerp(sr, 0.0, 0.0, x0, y0);
+            if (sr <= x1) return CatchPreprocessingUtils.Lerp(sr, x0, y0, x1, y1);
+            if (sr <= x2) return CatchPreprocessingUtils.Lerp(sr, x1, y1, x2, y2);
+            if (sr <= x3) return CatchPreprocessingUtils.Lerp(sr, x2, y2, x3, y3);
+            if (sr <= x4) return CatchPreprocessingUtils.Lerp(sr, x3, y3, x4, y4);
+            if (sr <= x5) return CatchPreprocessingUtils.Lerp(sr, x4, y4, x5, y5);
+            if (sr <= x6) return CatchPreprocessingUtils.Lerp(sr, x5, y5, x6, y6);
+            if (sr <= x7) return CatchPreprocessingUtils.Lerp(sr, x6, y6, x7, y7);
+            if (sr <= x8) return CatchPreprocessingUtils.Lerp(sr, x7, y7, x8, y8);
+
+            return CatchPreprocessingUtils.Lerp(sr, x8, y8, x9, y9);
+        }
+
 
         /// <summary>
         /// Replicates StrainSkill behaviour with Strain Peaks.
